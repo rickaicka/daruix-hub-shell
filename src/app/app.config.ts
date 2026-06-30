@@ -10,7 +10,8 @@ import {
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
-import { authInterceptor } from './core/auth/interceptors/auth.interceptor';
+import {provideIonicAngular} from '@ionic/angular/standalone';
+import {hubAuthInterceptor} from '@daruix/hub-auth';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,7 +19,8 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([authInterceptor])
-    )
+      withInterceptors([hubAuthInterceptor])
+    ),
+    provideIonicAngular()
   ]
 };

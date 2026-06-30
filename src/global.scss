@@ -1,0 +1,45 @@
+@use 'assets/styles/styles';
+@use 'assets/styles/base/variables';
+@use 'assets/styles/base/mixins';
+
+
+
+/* container geral */
+.swal2-popup {
+  font-family: 'Quicksand', sans-serif !important;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+/* título */
+.swal2-title {
+  font-family: "Science Gothic", sans-serif !important;
+  font-size: 22px;
+  color: #1a1a1a;
+}
+
+/* texto */
+.swal2-html-container {
+  font-size: 14px;
+  color: #555;
+}
+
+/* botão confirmar */
+.swal2-confirm {
+  background-color: #C00D0E !important;
+  border-radius: 6px !important;
+  padding: 10px 20px !important;
+  font-weight: bold;
+}
+
+/* botão cancelar */
+.swal2-cancel {
+  background-color: #e5e5e5 !important;
+  color: #333 !important;
+  border-radius: 6px !important;
+}
+
+/* hover */
+.swal2-confirm:hover {
+  background-color: #a50b0c !important;
+}

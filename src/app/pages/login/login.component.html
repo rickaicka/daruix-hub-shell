@@ -1,1 +1,147 @@
-<p>login works!</p>
+<section class="login-hub-container">
+  <div class="login-container-left">
+    <div class="container-texts">
+      <ul>
+        <li class="login-logo">
+          <img src="/assets/bg_login_wt.png">
+        </li>
+        <li class="login-acesso">
+          <div class="acesso-textos">
+            <ul>
+              <li>
+                <h1 class="gothic-xxgl bold-font">
+                  Acesse o Daruix Hub
+                </h1>
+              </li>
+              <li>
+                <p class="quicksand-r">
+                  Centralize seus aplicativos, processos e informações em um só lugar.
+                </p>
+              </li>
+              <li>
+                <p class="quicksand-r">
+                  Mais controle, agilidade e inteligência para sua gestão.
+                </p>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li class="login-tips">
+          <div class="tips-textos">
+            <ul>
+              <li class="tip-wrapper">
+                <div class="box-icon-tip">
+                  <svg lucideShieldCheck></svg>
+                </div>
+                <div class="box-text-tip">
+                  <p class="title-tip quicksand-m">Segurança e conformidade</p>
+                  <span class="title-tip raleway-sm">Seus dados protegidos com alto padrão de segurança.</span>
+                </div>
+              </li>
+              <div class="divider"></div>
+              <li class="tip-wrapper">
+                <div class="box-icon-tip">
+                  <svg lucideLayoutGrid></svg>
+                </div>
+                <div class="box-text-tip">
+                  <p class="title-tip quicksand-m">Tudo em um só lugar</p>
+                  <span class="title-tip raleway-sm">Acesse aplicativos, relatórios e informações de forma centralizada.</span>
+                </div>
+              </li>
+              <div class="divider"></div>
+              <li class="tip-wrapper">
+                <div class="box-icon-tip">
+                  <svg lucideChartNoAxesCombined></svg>
+                </div>
+                <div class="box-text-tip">
+                  <p class="title-tip quicksand-m">Mais eficiência para seu negócio</p>
+                  <span class="title-tip raleway-sm">Processos integrados, decisões mais rápidas e resultados melhores.</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="login-container-right">
+    <div class="login-wrapper">
+      @if(isMobile()){
+        <div class="logo-mobile">
+          <img src="./assets/img.png">
+        </div>
+      }
+      <form class="login-card" (ngSubmit)="onSubmit()">
+        <header class="login-card__brand">
+          <h1 class="gothic-xxg bold-font">Daruix Hub</h1>
+          <p class="quicksand-m">Acesse sua conta para continuar.</p>
+        </header>
+        <div class="login-card__field-wrapper">
+          <div class="login-card__field-wrapper__field">
+            <label for="username" class="quicksand-x bolder-font">Login</label>
+            <div class="login-card__field-wrapper__field__input-container">
+              <svg lucideUser2></svg>
+              <input
+                class="quicksand-m"
+                id="username"
+                autocomplete="username"
+                placeholder="username"
+                [formField]="loginForm.username"
+              />
+            </div>
+            @if (loginForm.username().touched() && loginForm.username().invalid()) {
+              @for (error of loginForm.username().errors(); track error.message) {
+                <p class="login-card__error quicksand-m bolder-font">
+                  {{ error.message }}
+                </p>
+              }
+            }
+          </div>
+          <div class="login-card__field-wrapper__field">
+            <label for="password" class="quicksand-x bolder-font">Senha</label>
+            <div class="login-card__field-wrapper__field__input-container">
+              <svg lucideLockKeyhole></svg>
+              <input
+                class="quicksand-m"
+                id="password"
+                autocomplete="password"
+                placeholder="password"
+                type="password"
+                [formField]="loginForm.password"
+              />
+            </div>
+            @if (loginForm.password().touched() && loginForm.password().invalid()) {
+              @for (error of loginForm.password().errors(); track error.message) {
+                <p class="login-card__error quicksand-m bolder-font">
+                  {{ error.message }}
+                </p>
+              }
+            }
+          </div>
+          @if (authStore.error()) {
+            <p class="login-card__error quicksand-m bolder-font">
+              {{ authStore.error() }}
+            </p>
+          }
+          <button
+            type="submit"
+            class="btn-primary quicksand-x"
+            [disabled]="loginForm().invalid() || authStore.loading()"
+          >
+            @if (authStore.loading()) {
+              <div class="align-btn">
+                <span>Entrando...</span>
+                <svg lucideLoader></svg>
+              </div>
+            } @else {
+              <div class="align-btn">
+                <span>Entrar</span>
+                <svg lucideArrowRightFromLine></svg>
+              </div>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

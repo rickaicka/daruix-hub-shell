@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
-
-import { authGuard } from './core/auth/guards/auth.guard';
-import { permissionGuard } from './core/auth/guards/permission.guard';
+import {loadRemoteModule} from '@angular-architects/native-federation';
+import {hubAuthGuard} from '@daruix/hub-auth';
 
 export const routes: Routes = [
   {
@@ -11,48 +10,38 @@ export const routes: Routes = [
         .then(c => c.LoginComponent)
   },
   {
-    path: 'unauthorized',
-    loadComponent: () =>
-      import('./pages/unauthorized/unauthorized.component')
-        .then(c => c.UnauthorizedComponent)
-  },
-  {
-    path: '',
-    canActivate: [authGuard],
+    path: 'hub',
+    canActivate: [hubAuthGuard],
     loadComponent: () =>
       import('./core/layout/hub-layout/hub-layout.component')
         .then(c => c.HubLayoutComponent),
     children: [
       {
         path: '',
-        loadComponent: () =>
-          import('./pages/dashboard/dashboard.component')
-            .then(c => c.DashboardComponent)
+        pathMatch: 'full',
+        redirectTo: '',
       },
       {
         path: 'remessas',
-        canActivate: [permissionGuard],
-        data: {
-          permission: 'remessas.access'
-        },
-        loadComponent: () =>
-          import('./pages/remessas-placeholder/remessas-placeholder.component')
-            .then(c => c.RemessasPlaceholderComponent)
-      },
-      {
-        path: 'admin',
-        canActivate: [permissionGuard],
-        data: {
-          permission: 'admin.access'
-        },
-        loadComponent: () =>
-          import('./pages/admin-placeholder/admin-placeholder.component')
-            .then(c => c.AdminPlaceholderComponent)
+        loadChildren: () =>
+          loadRemoteModule('remessas', './Routes')
+            .then((m) => {
+              console.log('[Shell] Remote remessas module:', m);
+              console.log('[Shell] REMESSAS_ROUTES:', m.REMESSAS_ROUTES);
+
+              return m.REMESSAS_ROUTES;
+            }),
       }
-    ]
+    ],
+
+  },
+  {
+    path: '',
+    pathMatch: 'full',
+    redirectTo: 'hub'
   },
   {
     path: '**',
-    redirectTo: ''
+    redirectTo: 'hub'
   }
 ];

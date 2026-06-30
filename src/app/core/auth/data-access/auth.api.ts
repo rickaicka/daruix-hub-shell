@@ -18,7 +18,7 @@ export class AuthApi {
 
   login(payload: LoginRequest) {
     return this.http.post<LoginResponse>(
-      `${this.apiUrl}/auth/mock-login/`,
+      `${this.apiUrl}/auth/login/`,
       payload
     );
   }
@@ -26,6 +26,13 @@ export class AuthApi {
   me() {
     return this.http.get<HubUser>(
       `${this.apiUrl}/auth/me/`
+    );
+  }
+
+  logout(refresh: string) {
+    return this.http.post<{ detail: string }>(
+      `${this.apiUrl}/auth/logout/`,
+      { refresh }
     );
   }
 

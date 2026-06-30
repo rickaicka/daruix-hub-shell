@@ -7,55 +7,35 @@ import {
   withState
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, tap, catchError, of } from 'rxjs';
+import { catchError, finalize, of, pipe, switchMap, tap } from 'rxjs';
 
 import { AuthApi } from '../data-access/auth.api';
 import {
   AuthState,
-  LoginRequest,
-  LoginResponse,
-  HubUser
+  LoginRequest
 } from '../models/auth.models';
-
-const ACCESS_TOKEN_KEY = 'daruix_hub_access_token';
-const REFRESH_TOKEN_KEY = 'daruix_hub_refresh_token';
-const USER_KEY = 'daruix_hub_user';
-
-function loadUserFromStorage(): HubUser | null {
-  const user = localStorage.getItem(USER_KEY);
-
-  if (!user) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(user) as HubUser;
-  } catch {
-    localStorage.removeItem(USER_KEY);
-    return null;
-  }
-}
+import {HubSessionService} from '@daruix/hub-auth';
 
 function initialState(): AuthState {
   return {
-    user: loadUserFromStorage(),
-    accessToken: localStorage.getItem(ACCESS_TOKEN_KEY),
-    refreshToken: localStorage.getItem(REFRESH_TOKEN_KEY),
+    usuario: null,
+    accessToken: null,
+    refreshToken: null,
     loading: false,
+    loginSuccess: false,
     error: null
   };
 }
 
-function persistSession(response: LoginResponse): void {
-  localStorage.setItem(ACCESS_TOKEN_KEY, response.access);
-  localStorage.setItem(REFRESH_TOKEN_KEY, response.refresh);
-  localStorage.setItem(USER_KEY, JSON.stringify(response.user));
-}
-
-function clearSession(): void {
-  localStorage.removeItem(ACCESS_TOKEN_KEY);
-  localStorage.removeItem(REFRESH_TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
+function clearAuthState(store: any): void {
+  patchState(store, {
+    usuario: null,
+    accessToken: null,
+    refreshToken: null,
+    loading: false,
+    loginSuccess: false,
+    error: null
+  });
 }
 
 export const AuthStore = signalStore(
@@ -65,28 +45,44 @@ export const AuthStore = signalStore(
 
   withComputed((store) => ({
     isLoggedIn: computed(() =>
-      !!store.accessToken() && !!store.user()
+      !!store.accessToken() && !!store.usuario()
     ),
 
     userName: computed(() =>
-      store.user()?.name ?? ''
+      store.usuario()?.nome ?? store.usuario()?.username ?? ''
     ),
 
     userPermissions: computed(() =>
-      store.user()?.permissions ?? []
+      store.usuario()?.permissoes ?? []
     ),
 
-    userApps: computed(() =>
-      store.user()?.apps ?? []
+    userModules: computed(() =>
+      store.usuario()?.modulos ?? []
     )
   })),
 
-  withMethods((store, authApi = inject(AuthApi)) => ({
+  withMethods((
+    store,
+    authApi = inject(AuthApi),
+    hubSession = inject(HubSessionService)
+  ) => ({
+    syncFromSession(): void {
+      hubSession.reloadFromStorage();
+
+      patchState(store, {
+        usuario: hubSession.usuario(),
+        accessToken: hubSession.accessToken(),
+        refreshToken: hubSession.refreshToken(),
+        error: null
+      });
+    },
+
     login: rxMethod<LoginRequest>(
       pipe(
         tap(() => {
           patchState(store, {
             loading: true,
+            loginSuccess: false,
             error: null
           });
         }),
@@ -94,29 +90,39 @@ export const AuthStore = signalStore(
         switchMap((payload) =>
           authApi.login(payload).pipe(
             tap((response) => {
-              persistSession(response);
+              hubSession.setSession({
+                usuario: response.usuario,
+                accessToken: response.access_token,
+                refreshToken: response.refresh_token
+              });
 
               patchState(store, {
-                user: response.user,
-                accessToken: response.access,
-                refreshToken: response.refresh,
-                loading: false,
+                usuario: response.usuario,
+                accessToken: response.access_token,
+                refreshToken: response.refresh_token,
+                loginSuccess: true,
                 error: null
               });
             }),
 
             catchError(() => {
-              clearSession();
+              hubSession.clearSession();
 
               patchState(store, {
-                user: null,
+                usuario: null,
                 accessToken: null,
                 refreshToken: null,
-                loading: false,
+                loginSuccess: false,
                 error: 'E-mail ou senha inválidos.'
               });
 
               return of(null);
+            }),
+
+            finalize(() => {
+              patchState(store, {
+                loading: false
+              });
             })
           )
         )
@@ -125,56 +131,91 @@ export const AuthStore = signalStore(
 
     loadMe: rxMethod<void>(
       pipe(
+        tap(() => {
+          patchState(store, {
+            loading: true,
+            error: null
+          });
+        }),
+
         switchMap(() =>
           authApi.me().pipe(
-            tap((user) => {
-              localStorage.setItem(USER_KEY, JSON.stringify(user));
+            tap((usuario) => {
+              hubSession.setUsuario(usuario);
 
               patchState(store, {
-                user,
+                usuario,
+                accessToken: hubSession.accessToken(),
+                refreshToken: hubSession.refreshToken(),
                 error: null
               });
             }),
 
             catchError(() => {
-              clearSession();
-
-              patchState(store, {
-                user: null,
-                accessToken: null,
-                refreshToken: null,
-                error: null
-              });
+              hubSession.clearSession();
+              clearAuthState(store);
 
               return of(null);
+            }),
+
+            finalize(() => {
+              patchState(store, {
+                loading: false
+              });
             })
           )
         )
       )
     ),
 
-    logout(): void {
-      clearSession();
+    logout: rxMethod<void>(
+      pipe(
+        tap(() => {
+          patchState(store, {
+            loading: true,
+            error: null
+          });
+        }),
 
-      patchState(store, {
-        user: null,
-        accessToken: null,
-        refreshToken: null,
-        loading: false,
-        error: null
-      });
-    },
+        switchMap(() => {
+          const refreshToken = hubSession.refreshToken() ?? store.refreshToken();
+
+          if (!refreshToken) {
+            hubSession.clearSession();
+            clearAuthState(store);
+
+            return of(null);
+          }
+
+          return authApi.logout(refreshToken).pipe(
+            tap(() => {
+              hubSession.clearSession();
+              clearAuthState(store);
+            }),
+
+            catchError(() => {
+              hubSession.clearSession();
+              clearAuthState(store);
+
+              return of(null);
+            })
+          );
+        }),
+
+        finalize(() => {
+          patchState(store, {
+            loading: false
+          });
+        })
+      )
+    ),
 
     hasPermission(permission: string): boolean {
       return store.userPermissions().includes(permission);
     },
 
-    hasApp(appId: string): boolean {
-      return store.userApps().includes(appId);
-    },
-
     setAccessToken(accessToken: string): void {
-      localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+      hubSession.setAccessToken(accessToken);
 
       patchState(store, {
         accessToken

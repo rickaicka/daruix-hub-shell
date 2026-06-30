@@ -1,0 +1,43 @@
+@if(!isMobile()){
+  <main class="hub-layout">
+    <aside class="hub-sidebar">
+      <!-- menu -->
+      <div class="hub-logo">
+        <img src="/assets/logo_horz_hub.png">
+      </div>
+      <div class="hub-side-divider">
+        <div></div>
+      </div>
+      <div class="hub-modules">
+        <ul>
+          @for (modulo of modulos(); track modulo.slug){
+
+            @if(!modulo.mobile_enabled){
+              <li (click)="navigateRoute(modulo.rota)">
+                <app-hub-icon [name]="modulo.icone || modulo.slug" />
+                <a class="quicksand-m bolder-font">{{modulo.nome}}</a>
+              </li>
+            }
+          }
+        </ul>
+      </div>
+      <div class="hub-img"></div>
+    </aside>
+
+    <section class="hub-content">
+      <app-drx-hub-header></app-drx-hub-header>
+      <router-outlet />
+    </section>
+  </main>
+} @else{
+  @for (modulo of modulos(); track modulo.slug){
+    @if(modulo.mobile_enabled){
+      <li (click)="navigateRoute(modulo.rota)">
+        <app-hub-icon [name]="modulo.icone || modulo.slug" />
+        <a class="quicksand-m bolder-font">{{modulo.nome}}</a>
+      </li>
+    }
+  }
+}
+
+<button (click)="logout()">Logout</button>
