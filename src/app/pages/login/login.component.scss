@@ -474,3 +474,15 @@
     gap: 10px;
   }
 }
+
+
+.logo-mobile{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 16px;
+  & img{
+    width: 42%;
+  }
+}

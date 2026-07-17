@@ -17,18 +17,21 @@ export const routes: Routes = [
         .then(c => c.HubLayoutComponent),
     children: [
       {
-        path: '',
-        pathMatch: 'full',
-        redirectTo: '',
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./pages/hub-dashboard/hub-dashboard.component')
+            .then(c => c.HubDashboardComponent)
       },
       {
-        path: 'remessas',
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'dashboard'
+      },
+      {
+        path: 'memorando-remessas',
         loadChildren: () =>
           loadRemoteModule('remessas', './Routes')
             .then((m) => {
-              console.log('[Shell] Remote remessas module:', m);
-              console.log('[Shell] REMESSAS_ROUTES:', m.REMESSAS_ROUTES);
-
               return m.REMESSAS_ROUTES;
             }),
       }

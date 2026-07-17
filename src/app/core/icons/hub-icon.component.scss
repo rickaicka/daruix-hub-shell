@@ -1,0 +1,34 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: var(--hub-icon-size, 24px);
+  height: var(--hub-icon-size, 24px);
+
+  color: inherit;
+  line-height: 0;
+  flex-shrink: 0;
+
+  &.cursor-pointer {
+    cursor: pointer;
+  }
+}
+
+:host ::ng-deep svg {
+  width: var(--hub-icon-size, 24px) !important;
+  height: var(--hub-icon-size, 24px) !important;
+
+  min-width: var(--hub-icon-size, 24px);
+  min-height: var(--hub-icon-size, 24px);
+
+  stroke: currentColor;
+}
+
+:host.is-filled {
+  color: #f4b400;
+}
+
+:host.is-filled ::ng-deep svg {
+  fill: currentColor;
+}

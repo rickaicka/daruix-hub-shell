@@ -1,43 +1,369 @@
 @if(!isMobile()){
-  <main class="hub-layout">
-    <aside class="hub-sidebar">
-      <!-- menu -->
-      <div class="hub-logo">
-        <img src="/assets/logo_horz_hub.png">
-      </div>
-      <div class="hub-side-divider">
-        <div></div>
-      </div>
-      <div class="hub-modules">
-        <ul>
-          @for (modulo of modulos(); track modulo.slug){
+  <main
+    class="hub-layout"
+    [class.is-sidebar-collapsed]="sidebarCollapsed()">
 
-            @if(!modulo.mobile_enabled){
-              <li (click)="navigateRoute(modulo.rota)">
-                <app-hub-icon [name]="modulo.icone || modulo.slug" />
-                <a class="quicksand-m bolder-font">{{modulo.nome}}</a>
-              </li>
-            }
+    <aside
+      class="hub-sidebar"
+      (mouseenter)="openCollapsedMenu()"
+      (mouseleave)="closeCollapsedMenu()">
+
+      <div class="hub-sidebar__top">
+        <button
+          type="button"
+          class="hub-brand"
+          aria-label="Ir para o dashboard"
+          (click)="navigateRoute('dashboard')">
+
+          @if(!sidebarCollapsed()){
+            <img
+              class="hub-brand__full"
+              src="/assets/img_2.png"
+              alt="Daruix Hub">
+          } @else {
+            <img
+              class="hub-brand__mark"
+              [class.active]="sidebarCollapsed()"
+              src="/assets/D_solo.png"
+              alt="Daruix Hub">
+          }
+        </button>
+      </div>
+
+      <nav class="hub-nav" aria-label="Menu principal">
+        <ul class="hub-menu">
+          @for (modulo of desktopModulos(); track modulo.slug) {
+            @let children = moduleChildren(modulo);
+
+            <li
+              class="hub-menu__item"
+              [class.has-children]="children.length > 0"
+              [class.is-open]="isGroupOpen(modulo.slug)">
+
+              <button
+                type="button"
+                class="hub-menu__button"
+                [class.is-active]="isActiveModule(modulo)"
+                (click)="handleModuleClick(modulo)">
+
+                <span class="hub-menu__icon">
+                  <app-hub-icon [name]="moduleIcon(modulo)" />
+                </span>
+
+                @if(!sidebarCollapsed()){
+                  <span class="hub-menu__label quicksand-m bolder-font">
+                    {{ moduleName(modulo) }}
+                  </span>
+
+                  @if(children.length > 0){
+                    <span class="hub-menu__chevron">
+                      <app-hub-icon name="chevron-down" />
+                    </span>
+                  }
+                }
+              </button>
+
+              @if(!sidebarCollapsed() && children.length > 0 && isGroupOpen(modulo.slug)){
+                <ul class="hub-submenu">
+                  @for (child of children; track child.slug) {
+                    <li>
+                      <button
+                        type="button"
+                        class="hub-submenu__button"
+                        [class.is-active]="isActiveModule(child)"
+                        (click)="navigateMenuItem(child)">
+                        {{ moduleName(child) }}
+                      </button>
+                    </li>
+                  }
+                </ul>
+              }
+            </li>
           }
         </ul>
+      </nav>
+
+      @if(sidebarCollapsed() && collapsedMenuOpen()){
+        <div class="hub-collapsed-panel">
+          <ul class="hub-collapsed-menu">
+
+            @for (modulo of desktopModulos(); track modulo.slug) {
+              @let children = moduleChildren(modulo);
+
+              <li
+                class="hub-collapsed-menu__group"
+                [class.is-open]="isGroupOpen(modulo.slug)">
+
+                <button
+                  type="button"
+                  class="hub-collapsed-menu__title"
+                  [class.is-active]="isActiveModule(modulo)"
+                  (click)="handleCollapsedPanelGroupClick(modulo)">
+
+                  <span class="hub-collapsed-menu__icon">
+                    <app-hub-icon [name]="moduleIcon(modulo)" />
+                  </span>
+
+                  <span class="hub-collapsed-menu__label quicksand-sm ">
+                    {{ moduleName(modulo) }}
+                  </span>
+
+                  @if(children.length > 0){
+                    <span class="hub-collapsed-menu__chevron">
+                      <app-hub-icon name="chevron-down" />
+                    </span>
+                  }
+                </button>
+
+                @if(children.length > 0 && isGroupOpen(modulo.slug)){
+                  <ul class="hub-collapsed-submenu">
+                    @for (child of children; track child.slug) {
+                      <li>
+                        <button
+                          type="button"
+                          class="hub-collapsed-submenu__button"
+                          [class.is-active]="isActiveModule(child)"
+                          (click)="navigateMenuItem(child)">
+                          {{ moduleName(child) }}
+                        </button>
+                      </li>
+                    }
+                  </ul>
+                }
+              </li>
+            }
+
+          </ul>
+        </div>
+      }
+
+      <div class="hub-sidebar__bottom">
+        <button
+          type="button"
+          class="hub-sidebar-action"
+          aria-label="Sair"
+          (click)="logout()">
+
+          <span class="hub-sidebar-action__icon">
+            <app-hub-icon name="log-out" />
+          </span>
+
+          @if(!sidebarCollapsed()){
+            <span class=" quicksand-sm ">Sair</span>
+          }
+        </button>
       </div>
-      <div class="hub-img"></div>
+
     </aside>
 
     <section class="hub-content">
-      <app-drx-hub-header></app-drx-hub-header>
+      <app-drx-hub-header
+        [userLogged]="usuario()"
+        [isMobile]="isMobile()"
+        [sidebarCollapsed]="sidebarCollapsed()"
+        (menuToggle)="toggleSidebar()">
+      </app-drx-hub-header>
+
       <router-outlet />
     </section>
   </main>
-} @else{
-  @for (modulo of modulos(); track modulo.slug){
-    @if(modulo.mobile_enabled){
-      <li (click)="navigateRoute(modulo.rota)">
-        <app-hub-icon [name]="modulo.icone || modulo.slug" />
-        <a class="quicksand-m bolder-font">{{modulo.nome}}</a>
-      </li>
-    }
-  }
-}
+} @else {
+  <main class="hub-mobile-layout">
 
-<button (click)="logout()">Logout</button>
+    <app-drx-hub-header
+      [userLogged]="usuario()"
+      [isMobile]="true"
+      [modulos]="modulos()"
+      (menuToggle)="toggleMobileMenu()">
+    </app-drx-hub-header>
+
+    <div
+      class="hub-mobile-menu-layer"
+      [class.is-open]="mobileMenuOpen()"
+      [attr.aria-hidden]="!mobileMenuOpen()">
+
+      <button
+        type="button"
+        class="hub-mobile-menu-backdrop"
+        aria-label="Fechar menu"
+        (click)="closeMobileMenu()">
+      </button>
+
+      <aside
+        class="hub-mobile-drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu principal">
+
+        <header class="hub-mobile-drawer__header">
+          <button
+            type="button"
+            class="hub-mobile-drawer__brand"
+            aria-label="Ir para o dashboard"
+            (click)="navigateMobileMenuItem({ rota: 'dashboard' })">
+
+            <img
+              src="/assets/logo_horz_hub_wt.png"
+              alt="Daruix Hub">
+          </button>
+
+          <button
+            type="button"
+            class="hub-mobile-drawer__close"
+            aria-label="Fechar menu"
+            (click)="closeMobileMenu()">
+            ×
+          </button>
+        </header>
+
+        <ion-content class="hub-mobile-drawer__scroll">
+          <nav class="hub-mobile-nav" aria-label="Menu mobile">
+            <ul class="hub-mobile-menu">
+
+              @for (modulo of mobileModulos(); track modulo.slug) {
+                @let children = mobileChildren(modulo);
+
+                <li
+                  class="hub-mobile-menu__item"
+                  [class.is-open]="isGroupOpen(modulo.slug)">
+
+                  <button
+                    type="button"
+                    class="hub-mobile-menu__button"
+                    [class.is-active]="isActiveModule(modulo)"
+                    (click)="handleMobileModuleClick(modulo)">
+
+                    <span class="hub-mobile-menu__icon">
+                      <app-hub-icon [name]="moduleIcon(modulo)" />
+                    </span>
+
+                    <span class="hub-mobile-menu__label quicksand-sm bolder-font">
+                      {{ moduleName(modulo) }}
+                    </span>
+
+                    @if(children.length > 0){
+                      <span class="hub-mobile-menu__chevron">
+                        <app-hub-icon name="chevron-down" />
+                      </span>
+                    }
+                  </button>
+
+                  @if(children.length > 0 && isGroupOpen(modulo.slug)){
+                    <ul class="hub-mobile-submenu">
+                      @for (child of children; track child.slug) {
+                        <li>
+                          <button
+                            type="button"
+                            class="hub-mobile-submenu__button"
+                            [class.is-active]="isActiveModule(child)"
+                            (click)="navigateMobileMenuItem(child)">
+
+                            <span class="hub-mobile-submenu__label quicksand-sm">
+                              {{ moduleName(child) }}
+                            </span>
+
+                            <span class="hub-mobile-submenu__badge quicksand-sm">
+                              {{ moduleAvailabilityLabel(child) }}
+                            </span>
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  }
+
+                </li>
+              }
+
+            </ul>
+          </nav>
+        </ion-content>
+
+        <footer class="hub-mobile-drawer__footer">
+          <div class="hub-mobile-availability">
+            <p class="quicksand-sm bolder-font">Disponibilidade</p>
+
+            <div class="hub-mobile-availability__row">
+              <span class="hub-mobile-availability__badge is-mobile">
+                mobile
+              </span>
+              <span class="quicksand-sm">Disponível no mobile</span>
+            </div>
+
+            <div class="hub-mobile-availability__row">
+              <span class="hub-mobile-availability__badge is-web">
+                web
+              </span>
+              <span class="quicksand-sm">Disponível apenas na web</span>
+            </div>
+          </div>
+        </footer>
+
+      </aside>
+    </div>
+
+    <ion-content class="hub-mobile-content">
+      <router-outlet />
+    </ion-content>
+
+    <nav class="hub-mobile-bottom-nav" aria-label="Navegação principal mobile">
+      <button
+        type="button"
+        class="hub-mobile-bottom-nav__item"
+        [class.is-active]="isRouteActive('dashboard')"
+        (click)="navigateRoute('dashboard')">
+
+      <span class="hub-mobile-bottom-nav__icon"
+            [class.hub-mobile-bottom-nav__circle]="isRouteActive('dashboard')">
+        <app-hub-icon name="home" />
+      </span>
+
+        <span class="hub-mobile-bottom-nav__label quicksand-sm">
+        Início
+      </span>
+      </button>
+      <button
+        type="button"
+        class="hub-mobile-bottom-nav__item"
+        [class.is-active]="isRouteActive('remessas')"
+        (click)="navigateRoute('remessas')">
+
+      <span class="hub-mobile-bottom-nav__icon"
+            [class.hub-mobile-bottom-nav__circle]="isRouteActive('remessas')">
+        <app-hub-icon name="payments" />
+      </span>
+        <span class="hub-mobile-bottom-nav__label quicksand-sm">
+        Aplicativos
+      </span>
+      </button>
+
+      <button
+        type="button"
+        class="hub-mobile-bottom-nav__item"
+        [class.is-active]="isRouteActive('fluxo')"
+        (click)="navigateRoute('fluxo')">
+
+      <span class="hub-mobile-bottom-nav__icon"
+            [class.hub-mobile-bottom-nav__circle]="isRouteActive('fluxo')">
+        <app-hub-icon name="user_profile" />
+      </span>
+        <span class="hub-mobile-bottom-nav__label quicksand-sm">
+        Perfil
+      </span>
+      </button>
+
+      <button
+        type="button"
+        class="hub-mobile-bottom-nav__item"
+        (click)="logout()">
+
+      <span class="hub-mobile-bottom-nav__icon">
+        <app-hub-icon name="log-out" />
+      </span>
+        <span class="hub-mobile-bottom-nav__label quicksand-sm">
+        Sair
+      </span>
+      </button>
+    </nav>
+
+  </main>
+}

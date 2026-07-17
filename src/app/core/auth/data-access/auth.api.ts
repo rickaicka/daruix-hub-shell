@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import {
@@ -16,30 +17,34 @@ export class AuthApi {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = environment.apiUrl;
 
-  login(payload: LoginRequest) {
+  login(payload: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(
       `${this.apiUrl}/auth/login/`,
       payload
     );
   }
 
-  me() {
+  me(): Observable<HubUser> {
     return this.http.get<HubUser>(
       `${this.apiUrl}/auth/me/`
     );
   }
 
-  logout(refresh: string) {
+  logout(refreshToken: string): Observable<{ detail: string }> {
     return this.http.post<{ detail: string }>(
       `${this.apiUrl}/auth/logout/`,
-      { refresh }
+      {
+        refresh_token: refreshToken
+      }
     );
   }
 
-  refresh(refresh: string) {
+  refresh(refreshToken: string): Observable<RefreshTokenResponse> {
     return this.http.post<RefreshTokenResponse>(
       `${this.apiUrl}/auth/refresh/`,
-      { refresh }
+      {
+        refresh_token: refreshToken
+      }
     );
   }
 }

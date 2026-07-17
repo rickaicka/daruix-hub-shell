@@ -3,6 +3,7 @@
 :root{
 
   --drx-gray-base: #e5e5e5;
+  --drx-gray-dark-base: #252831;
   --drx-red-base: #C00D0E;
 
   --ex-pure-black: #000000;
@@ -118,8 +119,8 @@ $status-order-text: (
   }
 
   .quicksand-#{$name}{
-    font-family: "Quicksand", serif;
-    font-optical-sizing: auto;
+    font-family: "Quicksand", serif !important;
+    font-optical-sizing: auto !important;
     font-weight: 400;
     font-size: $size+px;
   }
@@ -187,11 +188,11 @@ $i: 1;
 }
 
 .bold-font{
-  font-weight: 400;
+  font-weight: 400 !important;
 }
 
 .bolder-font{
-  font-weight: 600;
+  font-weight: 600 !important;
 }
 
 .text-align-center{
@@ -282,4 +283,13 @@ $breakpoint-ultra: 1920px;
     background: var(--ex-red-scale-700) !important;
     transition: all 0.3s ease-in-out !important;
   }
+}
+.button-reset {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }

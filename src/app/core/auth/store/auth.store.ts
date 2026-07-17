@@ -7,20 +7,30 @@ import {
   withState
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { catchError, finalize, of, pipe, switchMap, tap } from 'rxjs';
+import {
+  catchError,
+  finalize,
+  of,
+  pipe,
+  switchMap,
+  tap
+} from 'rxjs';
+
+import { HubSessionService } from '@daruix/hub-auth';
 
 import { AuthApi } from '../data-access/auth.api';
 import {
   AuthState,
+  HubModule,
   LoginRequest
 } from '../models/auth.models';
-import {HubSessionService} from '@daruix/hub-auth';
 
 function initialState(): AuthState {
   return {
     usuario: null,
     accessToken: null,
     refreshToken: null,
+    sessao: null,
     loading: false,
     loginSuccess: false,
     error: null
@@ -32,6 +42,7 @@ function clearAuthState(store: any): void {
     usuario: null,
     accessToken: null,
     refreshToken: null,
+    sessao: null,
     loading: false,
     loginSuccess: false,
     error: null
@@ -44,12 +55,35 @@ export const AuthStore = signalStore(
   withState<AuthState>(initialState()),
 
   withComputed((store) => ({
-    isLoggedIn: computed(() =>
-      !!store.accessToken() && !!store.usuario()
-    ),
+    isSessionExpired: computed(() => {
+      const sessao = store.sessao();
+
+      if (!sessao?.expira_em) {
+        return false;
+      }
+
+      return new Date(sessao.expira_em).getTime() <= Date.now();
+    }),
+
+    isLoggedIn: computed(() => {
+      const sessao = store.sessao();
+      const sessionExpired = Boolean(
+        sessao?.expira_em &&
+        new Date(sessao.expira_em).getTime() <= Date.now()
+      );
+
+      return (
+        Boolean(store.accessToken()) &&
+        Boolean(store.usuario()) &&
+        Boolean(sessao) &&
+        !sessionExpired
+      );
+    }),
 
     userName: computed(() =>
-      store.usuario()?.nome ?? store.usuario()?.username ?? ''
+      store.usuario()?.nome ??
+      store.usuario()?.username ??
+      ''
     ),
 
     userPermissions: computed(() =>
@@ -73,6 +107,7 @@ export const AuthStore = signalStore(
         usuario: hubSession.usuario(),
         accessToken: hubSession.accessToken(),
         refreshToken: hubSession.refreshToken(),
+        sessao: hubSession.sessao(),
         error: null
       });
     },
@@ -93,13 +128,15 @@ export const AuthStore = signalStore(
               hubSession.setSession({
                 usuario: response.usuario,
                 accessToken: response.access_token,
-                refreshToken: response.refresh_token
+                refreshToken: response.refresh_token,
+                sessao: response.sessao
               });
 
               patchState(store, {
                 usuario: response.usuario,
                 accessToken: response.access_token,
                 refreshToken: response.refresh_token,
+                sessao: response.sessao,
                 loginSuccess: true,
                 error: null
               });
@@ -107,12 +144,9 @@ export const AuthStore = signalStore(
 
             catchError(() => {
               hubSession.clearSession();
+              clearAuthState(store);
 
               patchState(store, {
-                usuario: null,
-                accessToken: null,
-                refreshToken: null,
-                loginSuccess: false,
                 error: 'E-mail ou senha inválidos.'
               });
 
@@ -147,6 +181,7 @@ export const AuthStore = signalStore(
                 usuario,
                 accessToken: hubSession.accessToken(),
                 refreshToken: hubSession.refreshToken(),
+                sessao: hubSession.sessao(),
                 error: null
               });
             }),
@@ -178,7 +213,9 @@ export const AuthStore = signalStore(
         }),
 
         switchMap(() => {
-          const refreshToken = hubSession.refreshToken() ?? store.refreshToken();
+          const refreshToken =
+            hubSession.refreshToken() ??
+            store.refreshToken();
 
           if (!refreshToken) {
             hubSession.clearSession();
@@ -198,14 +235,14 @@ export const AuthStore = signalStore(
               clearAuthState(store);
 
               return of(null);
+            }),
+
+            finalize(() => {
+              patchState(store, {
+                loading: false
+              });
             })
           );
-        }),
-
-        finalize(() => {
-          patchState(store, {
-            loading: false
-          });
         })
       )
     ),
@@ -219,6 +256,34 @@ export const AuthStore = signalStore(
 
       patchState(store, {
         accessToken
+      });
+    },
+
+    updateHubModule(updatedModule: HubModule): void {
+      const usuario = store.usuario();
+
+      if (!usuario) {
+        return;
+      }
+
+      const modulosAtualizados = (usuario.modulos ?? []).map((modulo) =>
+        modulo.slug === updatedModule.slug
+          ? {
+            ...modulo,
+            ...updatedModule
+          }
+          : modulo
+      );
+
+      const usuarioAtualizado = {
+        ...usuario,
+        modulos: modulosAtualizados
+      };
+
+      hubSession.setUsuario(usuarioAtualizado);
+
+      patchState(store, {
+        usuario: usuarioAtualizado
       });
     }
   }))

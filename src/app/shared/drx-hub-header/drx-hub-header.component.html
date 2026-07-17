@@ -1,1 +1,114 @@
-<p>drx-hub-header works!</p>
+@if (!isMobile()) {
+  <header class="header-hub-container">
+    <section class="header-hub-container__menus">
+      <button
+        class="button-reset header-menu-button"
+        type="button"
+        [attr.aria-label]="
+          sidebarCollapsed()
+            ? 'Expandir menu lateral'
+            : 'Recolher menu lateral'
+        "
+        (click)="menuToggle.emit()"
+      >
+        <svg lucideMenu></svg>
+      </button>
+    </section>
+
+    <section class="header-hub-container__actions">
+      <section class="header-hub-container__notificacao">
+        <button
+          class="button-reset notification-button"
+          type="button"
+          aria-label="Notificações"
+        >
+          <svg lucideBell></svg>
+
+          <span class="notificacao_qttd quicksand-sm">
+            99
+          </span>
+        </button>
+      </section>
+
+      <section class="header-hub-container__perfil">
+        <div class="user-circle">
+          <svg lucideUser></svg>
+        </div>
+
+        <div class="user-perfil">
+          <ul>
+            <li>
+              <p class="quicksand-r bolder-font">
+                {{ userLogged()?.nome || 'Usuário' }}
+              </p>
+            </li>
+
+            <li>
+              <p class="quicksand-m">
+                {{ userLogged()?.grupo || 'Sem grupo' }}
+              </p>
+            </li>
+          </ul>
+        </div>
+
+        <button
+          class="button-reset user-more"
+          type="button"
+          aria-label="Abrir opções do usuário"
+        >
+          <svg lucideChevronDown></svg>
+        </button>
+      </section>
+    </section>
+  </header>
+} @else {
+  <div
+    class="hub-mobile"
+    [class.hub-mobile--compact]="
+      compactMobileHeader()
+    "
+  >
+    <header class="hub-mobile__hero">
+      <div class="hub-mobile__topbar">
+        <button
+          class="icon-button"
+          type="button"
+          aria-label="Abrir menu"
+          (click)="menuToggle.emit()"
+        >
+          <svg lucideMenu></svg>
+        </button>
+
+        <img
+          class="hub-mobile__logo"
+          src="/assets/logo_horz_hub_wt.png"
+          alt="Daruix Hub"
+        />
+
+        <button
+          class="icon-button notification-button"
+          type="button"
+          aria-label="Notificações"
+        >
+          <svg lucideBell></svg>
+
+          <span class="quicksand-sm">
+            3
+          </span>
+        </button>
+      </div>
+
+      @if (showMobileWelcome()) {
+        <section class="hub-mobile__welcome">
+          <h2 class="gothic-r bolder-font">
+            Olá, {{ userLogged()?.nome || 'Usuário' }}!
+          </h2>
+
+          <p class="quicksand-m">
+            Acompanhe seus indicadores e continue de onde parou.
+          </p>
+        </section>
+      }
+    </header>
+  </div>
+}
