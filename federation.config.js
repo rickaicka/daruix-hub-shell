@@ -22,5 +22,6 @@ module.exports = withNativeFederation({
     'rxjs/fetch',
     'rxjs/testing',
     'rxjs/webSocket',
+    "@capacitor/android",
   ],
 });

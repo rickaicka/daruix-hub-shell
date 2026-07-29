@@ -1,0 +1,1 @@
+import{a as o}from"./chunk-7CQE7XW4.js";import"./chunk-2VMXMS7J.js";var e=window.location.hostname;o({remessas:`http://${e}:4301/remoteEntry.json`}).then(()=>import("./chunk-ZDEMRJO2.js")).catch(t=>{console.error("Falha ao inicializar o Native Federation:",t)});

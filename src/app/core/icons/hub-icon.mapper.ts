@@ -8,7 +8,7 @@ import {
   LucideChartBar,
   LucideSettings,
   LucideShieldCheck,
-  LucideCircleHelp, LucideLogOut, LucideHome, LucideHouse, LucideUser, LucideStar
+  LucideCircleHelp, LucideLogOut, LucideHome, LucideHouse, LucideUser, LucideStar, LucideChevronDown, LucideChevronUp
 } from '@lucide/angular';
 
 export const HUB_ICON_MAP: Record<string, Type<unknown>> = {
@@ -36,6 +36,8 @@ export const HUB_ICON_MAP: Record<string, Type<unknown>> = {
   admin_panel_settings: LucideShieldCheck,
   'log-out': LucideLogOut,
   favorito: LucideStar,
+  'chevron-down': LucideChevronDown,
+  'chevron-up': LucideChevronUp,
 };
 
 export function getHubIcon(iconName?: string | null): Type<unknown> {

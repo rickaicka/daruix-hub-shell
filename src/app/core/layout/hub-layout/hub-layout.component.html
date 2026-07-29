@@ -69,7 +69,7 @@
                     <li>
                       <button
                         type="button"
-                        class="hub-submenu__button"
+                        class="hub-submenu__button quicksand-m bolder-font"
                         [class.is-active]="isActiveModule(child)"
                         (click)="navigateMenuItem(child)">
                         {{ moduleName(child) }}
@@ -121,7 +121,7 @@
                       <li>
                         <button
                           type="button"
-                          class="hub-collapsed-submenu__button"
+                          class="hub-collapsed-submenu__button quicksand-m bolder-font"
                           [class.is-active]="isActiveModule(child)"
                           (click)="navigateMenuItem(child)">
                           {{ moduleName(child) }}
@@ -163,8 +163,9 @@
         [sidebarCollapsed]="sidebarCollapsed()"
         (menuToggle)="toggleSidebar()">
       </app-drx-hub-header>
-
-      <router-outlet />
+      <main class="grid-container">
+        <router-outlet />
+      </main>
     </section>
   </main>
 } @else {

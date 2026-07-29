@@ -1,9 +1,7 @@
 <section class="hub-dashboard">
   @if (isDesktop()) {
     <section class="hub-dashboard__title">
-      <h1 class="gothic-xxgl bolder-font">
-        Aplicativos
-      </h1>
+      <h1 class="gothic-xxgl bolder-font">Aplicativos</h1>
 
       <p class="quicksand-m">
         Encontre e acesse todos os módulos do Daruix Hub
@@ -12,83 +10,35 @@
 
     <section class="hub-dashboard__apps-container">
       @if (onlyFavorites().length > 0) {
-        <h2 class="gothic-x bolder-font">
-          Favoritos
-        </h2>
 
-        <section class="favs">
-          @for (
-            modulo of onlyFavorites();
-            track modulo.slug
-            ) {
-            <div>
-              <ul class="favs__item">
-                <li
-                  class="favs__item__col fav-icon"
-                  (click)="navigateRoute(modulo.rota)"
-                >
-                  <app-hub-icon
-                    [name]="modulo.icone"
-                  />
-                </li>
+        <article class="favorites-wrapper">
 
-                <li
-                  class="favs__item__col col-menu"
-                  (click)="navigateRoute(modulo.rota)"
-                >
-                  <span class="quicksand-m">
-                    {{ modulo.nome }}
-                  </span>
+          <h2 class="gothic-x bolder-font">Favoritos</h2>
 
-                  <p class="type-app-list">
-                    <span class="quicksand-sm">
-                      Web
-                    </span>
+          <section class="favs">
+            @for (favorite of onlyFavorites(); track favorite.item.slug) {
+              <drx-card
+                size="small"
+                [moduloColor]="moduleIconColor(favorite.module)"
+                [icon]="favorite.module.icone"
+                [title]="favorite.item.nome"
+                [favorite]="favorite.item.favorito"
+                [favoritable]="favorite.item.favoritavel"
+                (favoriteChange)="toggleFavorite($event, favorite.item)"
+              ></drx-card>
 
-                    @if (isVisibleOnMobile(modulo)) {
-                      <span class="quicksand-sm">
-                        Mobile
-                      </span>
-                    }
-                  </p>
-                </li>
-
-                <li class="favs__item__col fav-star">
-                  <app-hub-icon
-                    name="favorito"
-                    action
-                    [class.is-filled]="modulo.favorito"
-                    [attr.aria-label]="
-                      modulo.favorito
-                        ? 'Remover dos favoritos'
-                        : 'Adicionar aos favoritos'
-                    "
-                    [title]="
-                      modulo.favorito
-                        ? 'Remover dos favoritos'
-                        : 'Adicionar aos favoritos'
-                    "
-                    (click)="toggleFavorite($event, modulo)"
-                  />
-                </li>
-              </ul>
-            </div>
-          }
-        </section>
+            }
+          </section>
+        </article>
       }
 
-      <h2 class="gothic-x bolder-font">
-        Menu Principal
-      </h2>
+      <h2 class="gothic-x bolder-font">Menu Principal</h2>
 
       <section class="all">
-        @for (
-          modulo of userModules();
-          track modulo.slug;
-          let index = $index
-          ) {
-          @let children = moduleChildren(modulo);
-          @if(modulo.desktop_enabled){
+        @for (modulo of userModules(); track modulo.slug) {
+          @let children = moduleFeatures(modulo);
+
+          @if (modulo.desktop_enabled) {
             <article class="all__card">
               <header class="all__card-header">
                 <button
@@ -96,113 +46,89 @@
                   class="all__module"
                   (click)="navigateRoute(modulo.rota)"
                 >
-                <span class="all__module-icon">
-                  <app-hub-icon
-                    [name]="modulo.icone"
-                  />
-                </span>
+                  <span
+                    class="all__module-icon"
+                    [style.--module-icon-color]="moduleIconColor(modulo)"
+                  >
+                    <app-hub-icon [name]="modulo.icone" />
+                  </span>
 
                   <span class="all__module-info">
-                  <strong class="quicksand-m bolder-font">
-                    {{ modulo.nome }}
-                  </strong>
+                    <strong class="quicksand-m bolder-font">
+                      {{ modulo.nome }}
+                    </strong>
 
-                  <span
-                    class="all__module-platforms quicksand-sm"
-                  >
-                    Web
+                    <span class="all__module-platforms quicksand-sm">
+                      Web
 
-                    @if (isVisibleOnMobile(modulo)) {
-                      <span aria-hidden="true">
-                        •
-                      </span>
-
-                      Mobile
-                    }
+                      @if (isVisibleOnMobile(modulo)) {
+                        <span aria-hidden="true">•</span>
+                        Mobile
+                      }
+                    </span>
                   </span>
-                </span>
-                </button>
-
-                <button
-                  type="button"
-                  class="all__favorite"
-                  [class.all__favorite--active]="
-                  modulo.favorito
-                "
-                  [attr.aria-pressed]="modulo.favorito"
-                  [attr.aria-label]="
-                  modulo.favorito
-                    ? 'Remover dos favoritos'
-                    : 'Adicionar aos favoritos'
-                "
-                  [title]="
-                  modulo.favorito
-                    ? 'Remover dos favoritos'
-                    : 'Adicionar aos favoritos'
-                "
-                  (click)="toggleFavorite($event, modulo)"
-                >
-                  <app-hub-icon
-                    name="favorito"
-                    action
-                    [class.is-filled]="modulo.favorito"
-                  />
                 </button>
               </header>
 
               <div class="all__children">
                 @if (children.length > 0) {
-                  @for (
-                    child of children.slice(0, 5);
-                    track child.slug
-                    ) {
-                    <button
-                      type="button"
-                      class="all__child"
-                      (click)="navigateRoute(child.rota)"
-                    >
-                    <span
-                      class="all__child-arrow"
-                      aria-hidden="true"
-                    >
-                      ›
-                    </span>
-
-                      <span
-                        class="all__child-name quicksand-sm"
+                  @for (child of children.slice(0, 5); track child.slug) {
+                    <div class="all__child">
+                      <button
+                        type="button"
+                        class="all__child-link"
+                        (click)="navigateRoute(child.rota)"
                       >
-                      {{ child.nome }}
-                    </span>
+                        <span class="all__child-arrow" aria-hidden="true">
+                          ›
+                        </span>
 
-                      @if (child.favorito) {
-                        <span
-                          class="all__child-favorite"
-                          aria-label="Favorito"
-                        >
-                        ★
-                      </span>
-                      }
-                    </button>
+                        <span class="all__child-name quicksand-sm">
+                          {{ child.nome }}
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="all__child-favorite"
+                        [class.all__child-favorite--active]="itemIsFavorite(child)"
+                        [attr.aria-pressed]="itemIsFavorite(child)"
+                        [attr.aria-label]="
+                          itemIsFavorite(child)
+                            ? 'Remover dos favoritos'
+                            : 'Adicionar aos favoritos'
+                        "
+                        [title]="
+                          itemIsFavorite(child)
+                            ? 'Remover dos favoritos'
+                            : 'Adicionar aos favoritos'
+                        "
+                        (click)="toggleFavoriteFromButton($event, child)"
+                      >
+                        <app-hub-icon
+                          name="favorito"
+                          action
+                          [class.is-filled]="itemIsFavorite(child)"
+                        />
+                      </button>
+                    </div>
                   }
                 } @else {
-                  <button
-                    type="button"
-                    class="all__child all__child--single"
-                    (click)="navigateRoute(modulo.rota)"
-                  >
-                  <span
-                    class="all__child-arrow"
-                    aria-hidden="true"
-                  >
-                    ›
-                  </span>
-
-                    <span
-                      class="all__child-name quicksand-sm"
+                  <div class="all__child all__child--single">
+                    <button
+                      type="button"
+                      class="all__child-link"
+                      (click)="navigateRoute(modulo.rota)"
                     >
-                    Acessar {{ modulo.nome }}
-                  </span>
-                  </button>
+                      <span class="all__child-arrow" aria-hidden="true">
+                        ›
+                      </span>
+
+                      <span class="all__child-name quicksand-sm">
+                        Acessar {{ modulo.nome }}
+                      </span>
+                    </button>
+                  </div>
                 }
               </div>
 
@@ -218,9 +144,7 @@
                     Abrir módulo
                   }
 
-                  <span aria-hidden="true">
-                  ›
-                </span>
+                  <span aria-hidden="true">›</span>
                 </button>
               </footer>
             </article>
@@ -231,9 +155,7 @@
   } @else {
     <section class="mobile-dashboard">
       <header class="mobile-dashboard__header">
-        <h1 class="gothic-x bolder-font">
-          Aplicativos
-        </h1>
+        <h1 class="gothic-x bolder-font">Aplicativos</h1>
 
         <p class="quicksand-sm">
           Acesse rapidamente os módulos disponíveis no Daruix Hub.
@@ -244,9 +166,7 @@
         <ion-card-content>
           <header class="card-header">
             <div class="card-header__title">
-              <h2 class="quicksand-r bolder-font">
-                Acesso rápido
-              </h2>
+              <h2 class="quicksand-r bolder-font">Acesso rápido</h2>
 
               <span class="quicksand-sm">
                 {{ mobileModulos().length }}
@@ -258,10 +178,7 @@
               </span>
             </div>
 
-            @if (
-              mobileModulos().length >
-              mobilePreviewLimit
-              ) {
+            @if (mobileModulos().length > mobilePreviewLimit) {
               <button
                 type="button"
                 class="see-all-button quicksand-sm bolder-font"
@@ -280,34 +197,21 @@
           @if (visibleMobileModules().length > 0) {
             <ion-grid class="quick-grid">
               <ion-row>
-                @for (
-                  item of visibleMobileModules();
-                  track item.slug
-                  ) {
+                @for (item of visibleMobileModules(); track item.slug) {
                   <ion-col size="4">
                     <button
                       type="button"
                       class="quick-item"
-                      [attr.aria-label]="
-                        'Abrir módulo ' + item.nome
-                      "
+                      [attr.aria-label]="'Abrir módulo ' + item.nome"
                       (click)="navigateRoute(item.rota)"
                     >
-                      <span class="quick-icon-container">
+                      <span
+                        class="quick-icon-container"
+                        [style.--module-icon-color]="moduleIconColor(item)"
+                      >
                         <span class="quick-icon">
-                          <app-hub-icon
-                            [name]="item.icone"
-                          />
+                          <app-hub-icon [name]="item.icone" />
                         </span>
-
-                        @if (item.favorito) {
-                          <span
-                            class="quick-star"
-                            aria-label="Módulo favorito"
-                          >
-                            ★
-                          </span>
-                        }
                       </span>
 
                       <span
@@ -332,8 +236,8 @@
               </strong>
 
               <p class="quicksand-sm">
-                Não existem módulos habilitados para acesso pelo
-                dispositivo móvel.
+                Não existem módulos habilitados para acesso pelo dispositivo
+                móvel.
               </p>
             </div>
           }

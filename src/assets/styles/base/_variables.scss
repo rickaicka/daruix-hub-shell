@@ -1,5 +1,5 @@
 @use "sass:meta";
-
+@use "sass:list";
 :root{
 
   --drx-gray-base: #e5e5e5;
@@ -164,7 +164,7 @@ $i: 1;
     width: 130px;
     border-radius: 30px;
     text-align: center;
-    color: nth($status-order-text, $i);
+    color: list.nth($status-order-text, $i);
     &--mobile{
       margin: 0 auto;
       width: 115px;

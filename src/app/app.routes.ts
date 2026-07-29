@@ -1,50 +1,57 @@
 import { Routes } from '@angular/router';
-import {loadRemoteModule} from '@angular-architects/native-federation';
-import {hubAuthGuard} from '@daruix/hub-auth';
+import { loadRemoteModule } from '@angular-architects/native-federation';
+import { hubAuthGuard } from '@daruix/hub-auth';
+
+const remoteHost = window.location.hostname;
 
 export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () =>
-      import('./pages/login/login.component')
-        .then(c => c.LoginComponent)
+      import('./pages/login/login.component').then(
+        ({ LoginComponent }) => LoginComponent,
+      ),
   },
   {
     path: 'hub',
     canActivate: [hubAuthGuard],
     loadComponent: () =>
-      import('./core/layout/hub-layout/hub-layout.component')
-        .then(c => c.HubLayoutComponent),
+      import('./core/layout/hub-layout/hub-layout.component').then(
+        ({ HubLayoutComponent }) => HubLayoutComponent,
+      ),
     children: [
       {
         path: 'dashboard',
         loadComponent: () =>
-          import('./pages/hub-dashboard/hub-dashboard.component')
-            .then(c => c.HubDashboardComponent)
+          import('./pages/hub-dashboard/hub-dashboard.component').then(
+            ({ HubDashboardComponent }) => HubDashboardComponent,
+          ),
+      },
+      {
+        path: 'remessas',
+        loadChildren: () =>
+          loadRemoteModule({
+            remoteName: 'remessas',
+            remoteEntry: `http://${remoteHost}:4301/remoteEntry.json`,
+            exposedModule: './Routes',
+          }).then(
+            (remoteModule) => remoteModule.REMESSAS_ROUTES,
+          ),
       },
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'dashboard'
+        redirectTo: 'dashboard',
       },
-      {
-        path: 'memorando-remessas',
-        loadChildren: () =>
-          loadRemoteModule('remessas', './Routes')
-            .then((m) => {
-              return m.REMESSAS_ROUTES;
-            }),
-      }
     ],
-
   },
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'hub'
+    redirectTo: 'hub',
   },
   {
     path: '**',
-    redirectTo: 'hub'
-  }
+    redirectTo: 'hub',
+  },
 ];

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Daruix Hub</string>
+    <string name="title_activity_main">Daruix Hub</string>
+    <string name="package_name">br.com.daruix.hub</string>
+    <string name="custom_url_scheme">br.com.daruix.hub</string>
+</resources>

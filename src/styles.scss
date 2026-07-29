@@ -1,4 +1,4 @@
-/* You can add global styles to this file, and also import other style files */
+/* Ionic */
 @use '@ionic/angular/css/core.css';
 @use '@ionic/angular/css/normalize.css';
 @use '@ionic/angular/css/structure.css';
@@ -9,6 +9,21 @@
 @use '@ionic/angular/css/text-alignment.css';
 @use '@ionic/angular/css/text-transformation.css';
 @use '@ionic/angular/css/flex-utils.css';
-@use 'assets/styles/styles';
-@use 'assets/styles/base/variables';
-@use 'assets/styles/base/mixins';
+
+/* Daruix Design System */
+@use '@daruix/hub-ui/styles' as drx;
+
+/* Estilos do Shell */
+@use 'assets/styles/styles' as shell;
+@use 'assets/styles/base/variables' as variables;
+@use 'assets/styles/base/mixins' as mixins;
+
+.grid-container > router-outlet {
+  display: none;
+}
+
+.grid-container > router-outlet + * {
+  width: 100%;
+  min-width: 0;
+  grid-column: 1 / -1;
+}
