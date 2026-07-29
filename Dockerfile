@@ -9,8 +9,7 @@ RUN npm ci --no-audit --no-fund
 
 COPY . .
 
-RUN test -f /app/public/remotes/remessas/remoteEntry.json \
-    && npm run build:shell \
+RUN npm run build:shell \
     && test -f /app/dist/daruix-hub-shell/index.html
 
 
