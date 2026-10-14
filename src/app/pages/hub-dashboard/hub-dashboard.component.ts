@@ -148,45 +148,59 @@ export class HubDashboardComponent {
 
   navigateRoute(
     route: string,
-    module?: HubModule,
+    log?: HubModule,
   ): void {
-    const requestedRoute =
-      route?.trim() ||
-      module?.rota?.trim() ||
-      module?.slug?.trim();
-
-    if (!requestedRoute) {
-      console.warn(
-        '[HubDashboard] Módulo sem rota:',
-        module,
-      );
+    if (!route?.trim()) {
       return;
     }
 
-    const cleanRoute = requestedRoute
-      .replace(/^\/+|\/+$/g, '');
+    let concatRoute = '';
+    let parent: any;
 
-    const hubRoute = cleanRoute.startsWith('hub/')
-      ? `/${cleanRoute}`
-      : `/hub/${cleanRoute}`;
+    if (
+      log &&
+      log?.children.length > 0
+    ) {
+      log?.children.find(
+        (l: any) => {
+          if (l.children.length > 0) {
+            parent = l;
 
-    void this.router.navigateByUrl(hubRoute).then(
-      (success) => {
-        if (!success) {
-          console.warn(
-            '[HubDashboard] Navegação não concluída:',
-            hubRoute,
-            module,
-          );
-        }
-      },
-    ).catch((error) => {
-      console.error(
-        '[HubDashboard] Erro ao navegar:',
-        hubRoute,
-        error,
+            l.children.find(
+              (lt: any) => {
+                if (
+                  lt.rota === route
+                ) {
+                  concatRoute =
+                    `${parent.slug}/${lt.rota}`;
+                }
+              },
+            );
+          }
+        },
       );
-    });
+    }
+
+    const cleanRoute =
+      (concatRoute || route)
+        .trim()
+        .replace(
+          /^\/hub\/?/,
+          '',
+        )
+        .replace(
+          /^\/+|\/+$/g,
+          '',
+        );
+
+    if (!cleanRoute) {
+      return;
+    }
+
+    void this.router.navigate([
+      '/hub',
+      ...cleanRoute.split('/'),
+    ]);
   }
 
   moduleChildren(
