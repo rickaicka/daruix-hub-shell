@@ -148,15 +148,23 @@ export class HubDashboardComponent {
 
   navigateRoute(
     route: string,
-    log?: HubModule,
+    module?: HubModule,
   ): void {
-    const cleanRoute = route
-      ?.trim()
-      .replace(/^\/+|\/+$/g, '');
+    const requestedRoute =
+      route?.trim() ||
+      module?.rota?.trim() ||
+      module?.slug?.trim();
 
-    if (!cleanRoute) {
+    if (!requestedRoute) {
+      console.warn(
+        '[HubDashboard] Módulo sem rota:',
+        module,
+      );
       return;
     }
+
+    const cleanRoute = requestedRoute
+      .replace(/^\/+|\/+$/g, '');
 
     const hubRoute = cleanRoute.startsWith('hub/')
       ? `/${cleanRoute}`
@@ -168,7 +176,7 @@ export class HubDashboardComponent {
           console.warn(
             '[HubDashboard] Navegação não concluída:',
             hubRoute,
-            log,
+            module,
           );
         }
       },
