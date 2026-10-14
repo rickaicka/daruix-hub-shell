@@ -150,57 +150,35 @@ export class HubDashboardComponent {
     route: string,
     log?: HubModule,
   ): void {
-    if (!route?.trim()) {
-      return;
-    }
-
-    let concatRoute = '';
-    let parent: any;
-
-    if (
-      log &&
-      log?.children.length > 0
-    ) {
-      log?.children.find(
-        (l: any) => {
-          if (l.children.length > 0) {
-            parent = l;
-
-            l.children.find(
-              (lt: any) => {
-                if (
-                  lt.rota === route
-                ) {
-                  concatRoute =
-                    `${parent.slug}/${lt.rota}`;
-                }
-              },
-            );
-          }
-        },
-      );
-    }
-
-    const cleanRoute =
-      (concatRoute || route)
-        .trim()
-        .replace(
-          /^\/hub\/?/,
-          '',
-        )
-        .replace(
-          /^\/+|\/+$/g,
-          '',
-        );
+    const cleanRoute = route
+      ?.trim()
+      .replace(/^\/+|\/+$/g, '');
 
     if (!cleanRoute) {
       return;
     }
 
-    void this.router.navigate([
-      '/hub',
-      ...cleanRoute.split('/'),
-    ]);
+    const hubRoute = cleanRoute.startsWith('hub/')
+      ? `/${cleanRoute}`
+      : `/hub/${cleanRoute}`;
+
+    void this.router.navigateByUrl(hubRoute).then(
+      (success) => {
+        if (!success) {
+          console.warn(
+            '[HubDashboard] Navegação não concluída:',
+            hubRoute,
+            log,
+          );
+        }
+      },
+    ).catch((error) => {
+      console.error(
+        '[HubDashboard] Erro ao navegar:',
+        hubRoute,
+        error,
+      );
+    });
   }
 
   moduleChildren(
