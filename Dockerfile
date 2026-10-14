@@ -16,8 +16,10 @@ RUN npm run build:shell \
 FROM nginx:alpine
 
 ENV BFF_UPSTREAM=host.docker.internal:8000 \
-    REMESSAS_UPSTREAM=host.docker.internal:4301 \
-    NGINX_ENVSUBST_FILTER="^(BFF_UPSTREAM|REMESSAS_UPSTREAM)$"
+    REMESSAS_UPSTREAM=daruix-hub-remessas:80 \
+    OBRAS_UPSTREAM=daruix-hub-obras:80 \
+    CADASTROS_UPSTREAM=daruix-hub-cadastros:80 \
+    NGINX_ENVSUBST_FILTER="^(BFF_UPSTREAM|REMESSAS_UPSTREAM|OBRAS_UPSTREAM|CADASTROS_UPSTREAM)$"
 
 COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /app/dist/daruix-hub-shell/ /usr/share/nginx/html/

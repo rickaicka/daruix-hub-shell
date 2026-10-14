@@ -11,14 +11,21 @@ import {
   Router,
   RouterOutlet
 } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { IonContent } from '@ionic/angular/standalone';
 import { filter } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+import {
+  DrxSidebarComponent,
+  DrxSidebarFeature,
+  DrxSidebarModule,
+  DrxSidebarSelection
+} from '@daruix/hub-ui';
 
 import { AuthStore } from '../../auth/store/auth.store';
 import { ViewportStore } from '../../device/viewport.store';
-import { DrxHubHeaderComponent } from '../../../shared/drx-hub-header/drx-hub-header.component';
 import { HubIconComponent } from '../../icons/hub-icon.component';
+import { DrxHubHeaderComponent } from '../../../shared/drx-hub-header/drx-hub-header.component';
 
 @Component({
   selector: 'app-hub-layout',
@@ -27,6 +34,7 @@ import { HubIconComponent } from '../../icons/hub-icon.component';
     RouterOutlet,
     DrxHubHeaderComponent,
     HubIconComponent,
+    DrxSidebarComponent,
     IonContent
   ],
   templateUrl: './hub-layout.component.html',
@@ -45,18 +53,11 @@ export class HubLayoutComponent {
   readonly isDesktop = this.viewportStore.isDesktop;
 
   readonly sidebarCollapsed = signal(false);
-  readonly collapsedMenuOpen = signal(false);
   readonly expandedGroups = signal<Record<string, boolean>>({});
   readonly mobileMenuOpen = signal(false);
 
-  readonly currentUrl = signal(this.normalizeRoute(this.router.url));
-
-  readonly nomeUsuario = computed(() =>
-    this.authStore.usuario()?.nome ?? 'Usuário'
-  );
-
-  readonly permissoes = computed(() =>
-    this.authStore.usuario()?.permissoes ?? []
+  readonly currentUrl = signal(
+    this.normalizeRoute(this.router.url)
   );
 
   readonly modulos = computed(() =>
@@ -64,13 +65,28 @@ export class HubLayoutComponent {
   );
 
   readonly desktopModulos = computed(() =>
-    this.modulos().filter((modulo: any) => modulo.desktop_enabled !== false)
+    this.modulos().filter(
+      (modulo: any) => modulo.desktop_enabled !== false
+    )
   );
 
   readonly mobileModulos = computed(() =>
-    this.modulos().filter((modulo: any) => this.isVisibleOnMobile(modulo))
+    this.modulos().filter((modulo: any) =>
+      this.isVisibleOnMobile(modulo)
+    )
   );
 
+  /**
+   * Adapta o contrato retornado pelo BFF ao contrato estável do Design System.
+   *
+   * Estrutura final:
+   * módulo -> categoria -> feature.
+   */
+  readonly sidebarItems = computed<readonly DrxSidebarModule[]>(() =>
+    this.desktopModulos().map((module: any, moduleIndex: number) =>
+      this.toSidebarModule(module, moduleIndex)
+    )
+  );
 
   constructor() {
     this.authStore.syncFromSession();
@@ -78,11 +94,16 @@ export class HubLayoutComponent {
 
     this.router.events
       .pipe(
-        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        filter(
+          (event): event is NavigationEnd =>
+            event instanceof NavigationEnd
+        ),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(event => {
-        this.currentUrl.set(this.normalizeRoute(event.urlAfterRedirects));
+        this.currentUrl.set(
+          this.normalizeRoute(event.urlAfterRedirects)
+        );
       });
 
     effect(() => {
@@ -91,7 +112,7 @@ export class HubLayoutComponent {
       }
 
       if (!this.authStore.isLoggedIn()) {
-        this.router.navigate(['/login']);
+        void this.router.navigate(['/login']);
       }
     });
   }
@@ -102,96 +123,48 @@ export class HubLayoutComponent {
 
   toggleSidebar(): void {
     this.sidebarCollapsed.update(value => !value);
-    this.closeCollapsedMenu();
   }
 
-  openCollapsedMenu(): void {
-    if (!this.sidebarCollapsed()) {
-      return;
-    }
-
-    this.collapsedMenuOpen.set(true);
-  }
-
-  closeCollapsedMenu(): void {
-    this.collapsedMenuOpen.set(false);
-  }
-
-  handleModuleClick(modulo: any): void {
-    const children = this.moduleChildren(modulo);
-
-    if (this.sidebarCollapsed()) {
-      if (children.length > 0) {
-        this.openCollapsedMenu();
-        return;
-      }
-
-      this.navigateMenuItem(modulo);
-      return;
-    }
-
-    if (children.length > 0) {
-      this.toggleGroup(modulo.slug);
-      return;
-    }
-
-    this.navigateMenuItem(modulo);
-  }
-
-  handleCollapsedPanelGroupClick(modulo: any): void {
-    const children = this.moduleChildren(modulo);
-
-    if (children.length > 0) {
-      this.toggleGroup(modulo.slug);
-      return;
-    }
-
-    this.navigateMenuItem(modulo);
-  }
-
-  navigateMenuItem(item: any): void {
-    const route = this.moduleRoute(item);
-
-    if (!route) {
-      return;
-    }
-
-    this.closeCollapsedMenu();
-    this.closeMobileMenu();
-    this.navigateRoute(route);
-  }
-
-  toggleGroup(slug: string): void {
-    this.expandedGroups.update(groups => ({
-      ...groups,
-      [slug]: !(groups[slug] ?? true)
-    }));
-  }
-
-  isGroupOpen(slug: string): boolean {
-    return this.expandedGroups()[slug] ?? true;
+  handleSidebarSelection(
+    selection: DrxSidebarSelection
+  ): void {
+    this.navigateRoute(selection.route);
   }
 
   moduleChildren(modulo: any): any[] {
     return (
-      modulo.children ??
-      modulo.submodulos ??
-      modulo.submodules ??
-      modulo.modulos ??
+      modulo?.children ??
+      modulo?.submodulos ??
+      modulo?.submodules ??
+      modulo?.modulos ??
       []
     );
   }
 
   moduleName(modulo: any): string {
-    return modulo.nome ?? modulo.name ?? modulo.slug;
+    return (
+      modulo?.nome ??
+      modulo?.name ??
+      modulo?.label ??
+      modulo?.slug ??
+      'Item'
+    );
   }
 
   moduleIcon(modulo: any): string {
-    return modulo.icone ?? modulo.icon ?? modulo.slug ?? 'square';
+    return (
+      this.explicitIcon(modulo) ??
+      modulo?.slug ??
+      'square'
+    );
   }
 
   moduleRoute(modulo: any): string {
-    return modulo.rota ?? modulo.route ?? '';
+    return (
+      this.explicitRoute(modulo) ||
+      modulo?.modulo_slug ||
+      ''
+    );
   }
 
   isActiveModule(modulo: any): boolean {
@@ -199,7 +172,9 @@ export class HubLayoutComponent {
     const currentUrl = this.currentUrl();
 
     if (route) {
-      const targetRoute = this.normalizeRoute(this.buildHubRoute(route));
+      const targetRoute = this.normalizeRoute(
+        this.buildHubRoute(route)
+      );
 
       if (
         currentUrl === targetRoute ||
@@ -209,48 +184,19 @@ export class HubLayoutComponent {
       }
     }
 
-    return this.moduleChildren(modulo).some(child => this.isActiveModule(child));
+    return this.moduleChildren(modulo).some(child =>
+      this.isActiveModule(child)
+    );
   }
 
-  getModuleRoute(rota: string): string[] {
-    return [this.buildHubRoute(rota)];
-  }
+  navigateRoute(route: string): void {
+    const targetRoute = this.buildHubRoute(route);
 
-  navigateRoute(rota: string): void {
-    const route = this.buildHubRoute(rota);
-
-    if (!route) {
+    if (!targetRoute) {
       return;
     }
 
-    this.router.navigateByUrl(route);
-  }
-
-  private buildHubRoute(rota: string): string {
-    if (!rota) {
-      return '/hub';
-    }
-
-    if (rota.startsWith('/hub')) {
-      return rota;
-    }
-
-    const cleanRoute = rota.replace(/^\/+/, '');
-
-    if (!cleanRoute) {
-      return '/hub';
-    }
-
-    return `/hub/${cleanRoute}`;
-  }
-
-  private normalizeRoute(route: string): string {
-    const cleanRoute = route
-      .split('?')[0]
-      .split('#')[0]
-      .replace(/\/+$/, '');
-
-    return cleanRoute || '/';
+    void this.router.navigateByUrl(targetRoute);
   }
 
   openMobileMenu(): void {
@@ -265,11 +211,22 @@ export class HubLayoutComponent {
     this.mobileMenuOpen.update(value => !value);
   }
 
+  toggleGroup(slug: string): void {
+    this.expandedGroups.update(groups => ({
+      ...groups,
+      [slug]: !(groups[slug] ?? true)
+    }));
+  }
+
+  isGroupOpen(slug: string): boolean {
+    return this.expandedGroups()[slug] ?? true;
+  }
+
   handleMobileModuleClick(modulo: any): void {
     const children = this.mobileChildren(modulo);
 
     if (children.length > 0) {
-      this.toggleGroup(modulo.slug);
+      this.toggleGroup(this.moduleKey(modulo));
       return;
     }
 
@@ -288,23 +245,29 @@ export class HubLayoutComponent {
   }
 
   mobileChildren(modulo: any): any[] {
-    return this.moduleChildren(modulo).filter(child => this.isVisibleOnMobile(child));
+    return this.moduleChildren(modulo).filter(child =>
+      this.isVisibleOnMobile(child)
+    );
   }
 
   isVisibleOnMobile(modulo: any): boolean {
     const children = this.moduleChildren(modulo);
+    const hasVisibleChild = children.some(child =>
+      this.isVisibleOnMobile(child)
+    );
 
-    const hasVisibleChild = children.some(child => this.isVisibleOnMobile(child));
-
-    return (hasVisibleChild || (modulo.mobile_enabled && !modulo.legacy_enabled));
+    return (
+      hasVisibleChild ||
+      (modulo?.mobile_enabled && !modulo?.legacy_enabled)
+    );
   }
 
   moduleAvailabilityLabel(modulo: any): string {
-    if (modulo.legacy_enabled === true) {
+    if (modulo?.legacy_enabled === true) {
       return 'legado';
     }
 
-    if (modulo.mobile_enabled !== false) {
+    if (modulo?.mobile_enabled !== false) {
       return 'mobile';
     }
 
@@ -313,11 +276,269 @@ export class HubLayoutComponent {
 
   isRouteActive(route: string): boolean {
     const currentRoute = this.currentUrl();
-    const targetRoute = this.normalizeRoute(this.buildHubRoute(route));
+    const targetRoute = this.normalizeRoute(
+      this.buildHubRoute(route)
+    );
 
     return (
       currentRoute === targetRoute ||
       currentRoute.startsWith(`${targetRoute}/`)
     );
+  }
+
+  moduleKey(modulo: any): string {
+    return String(
+      modulo?.slug ??
+      modulo?.id ??
+      modulo?.modulo_slug ??
+      modulo?.rota ??
+      modulo?.route ??
+      this.moduleName(modulo)
+    );
+  }
+
+  private toSidebarModule(
+    module: any,
+    moduleIndex: number
+  ): DrxSidebarModule {
+    const moduleId = this.nodeId(
+      module,
+      `module-${moduleIndex}`
+    );
+    const children = this.moduleChildren(module).filter(
+      child => child?.desktop_enabled !== false
+    );
+
+    const categories: Array<{
+      id: string;
+      label: string;
+      icon?: string;
+      features: readonly DrxSidebarFeature[];
+    }> = [];
+    const directFeatures: DrxSidebarFeature[] = [];
+    const moduleBaseRoute = this.resolveModuleBaseRoute(module);
+
+    children.forEach((child, categoryIndex) => {
+      const grandchildren = this.moduleChildren(child).filter(
+        feature => feature?.desktop_enabled !== false
+      );
+
+      if (grandchildren.length === 0) {
+        const directFeature = this.toSidebarFeature(
+          child,
+          moduleId,
+          'general',
+          categoryIndex,
+          moduleBaseRoute
+        );
+
+        if (directFeature) {
+          directFeatures.push(directFeature);
+        }
+
+        return;
+      }
+
+      const categoryId = this.nodeId(
+        child,
+        `category-${categoryIndex}`
+      );
+      const features = grandchildren
+        .map((feature, featureIndex) =>
+          this.toSidebarFeature(
+            feature,
+            moduleId,
+            categoryId,
+            featureIndex,
+            moduleBaseRoute
+          )
+        )
+        .filter(
+          (feature): feature is DrxSidebarFeature =>
+            feature !== null
+        );
+
+      if (features.length > 0) {
+        categories.push({
+          id: `${moduleId}:${categoryId}`,
+          label: this.moduleName(child),
+          icon: this.explicitIcon(child),
+          features
+        });
+      }
+    });
+
+    if (directFeatures.length > 0) {
+      categories.unshift({
+        id: `${moduleId}:general`,
+        label: 'Geral',
+        features: directFeatures
+      });
+    }
+
+    return {
+      id: moduleId,
+      label: this.moduleName(module),
+      icon: this.moduleIcon(module),
+      route: moduleBaseRoute || undefined,
+      categories
+    };
+  }
+
+  private toSidebarFeature(
+    feature: any,
+    moduleId: string,
+    categoryId: string,
+    featureIndex: number,
+    moduleBaseRoute: string
+  ): DrxSidebarFeature | null {
+    // Uma feature nunca pode usar `modulo_slug` como rota. Esse campo
+    // identifica o MFE/módulo proprietário, não a tela final.
+    const explicitRoute = this.explicitRoute(feature);
+
+    if (!explicitRoute) {
+      return null;
+    }
+
+    const featureId = this.nodeId(
+      feature,
+      `feature-${featureIndex}`
+    );
+
+    return {
+      id: `${moduleId}:${categoryId}:${featureId}`,
+      label: this.moduleName(feature),
+      icon: this.explicitIcon(feature),
+      route: this.resolveFeatureRoute(
+        explicitRoute,
+        moduleBaseRoute
+      ),
+      disabled: feature?.desktop_enabled === false
+    };
+  }
+
+  private nodeId(node: any, fallback: string): string {
+    return String(
+      node?.slug ??
+      node?.id ??
+      node?.modulo_slug ??
+      node?.rota ??
+      node?.route ??
+      fallback
+    );
+  }
+
+  private explicitIcon(node: any): string | undefined {
+    const icon =
+      node?.icone ??
+      node?.icon ??
+      node?.icone_nome ??
+      node?.icon_name;
+
+    if (typeof icon !== 'string' || !icon.trim()) {
+      return undefined;
+    }
+
+    return icon.trim();
+  }
+
+  private explicitRoute(node: any): string {
+    const route =
+      node?.rota ??
+      node?.route ??
+      node?.url ??
+      node?.path ??
+      node?.caminho ??
+      node?.modulo_rota;
+
+    if (typeof route !== 'string') {
+      return '';
+    }
+
+    return route.trim();
+  }
+
+  private resolveModuleBaseRoute(module: any): string {
+    const route =
+      this.explicitRoute(module) ||
+      (typeof module?.modulo_slug === 'string'
+        ? module.modulo_slug.trim()
+        : '');
+
+    return route ? this.buildHubRoute(route) : '';
+  }
+
+  private resolveFeatureRoute(
+    featureRoute: string,
+    moduleBaseRoute: string
+  ): string {
+    if (featureRoute.startsWith('/hub')) {
+      return this.normalizeRoute(featureRoute);
+    }
+
+    if (
+      featureRoute === 'hub' ||
+      featureRoute.startsWith('hub/')
+    ) {
+      return this.buildHubRoute(featureRoute);
+    }
+
+    const isRootRelative = featureRoute.startsWith('/');
+    const cleanFeatureRoute = featureRoute.replace(/^\/+/, '');
+
+    if (!moduleBaseRoute) {
+      return this.buildHubRoute(cleanFeatureRoute);
+    }
+
+    const cleanModuleRoute = moduleBaseRoute.replace(
+      /^\/hub\/?/,
+      ''
+    );
+
+    if (
+      cleanFeatureRoute === cleanModuleRoute ||
+      cleanFeatureRoute.startsWith(`${cleanModuleRoute}/`) ||
+      isRootRelative
+    ) {
+      return this.buildHubRoute(cleanFeatureRoute);
+    }
+
+    return `${this.normalizeRoute(moduleBaseRoute)}/${cleanFeatureRoute}`;
+  }
+
+  private buildHubRoute(route: string): string {
+    if (!route) {
+      return '/hub';
+    }
+
+    const normalizedInput = route.trim();
+
+    if (normalizedInput.startsWith('/hub')) {
+      return this.normalizeRoute(normalizedInput);
+    }
+
+    if (
+      normalizedInput === 'hub' ||
+      normalizedInput.startsWith('hub/')
+    ) {
+      return this.normalizeRoute(`/${normalizedInput}`);
+    }
+
+    const cleanRoute = normalizedInput.replace(/^\/+/, '');
+
+    if (!cleanRoute) {
+      return '/hub';
+    }
+
+    return `/hub/${cleanRoute}`;
+  }
+
+  private normalizeRoute(route: string): string {
+    const cleanRoute = route
+      .split('?')[0]
+      .split('#')[0]
+      .replace(/\/+$/, '');
+
+    return cleanRoute || '/';
   }
 }

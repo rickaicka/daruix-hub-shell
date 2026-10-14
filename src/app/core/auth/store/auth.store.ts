@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { computed, inject } from '@angular/core';
 import {
   patchState,
@@ -186,9 +187,13 @@ export const AuthStore = signalStore(
               });
             }),
 
-            catchError(() => {
-              hubSession.clearSession();
-              clearAuthState(store);
+            catchError((error: unknown) => {
+              // O hubAuthInterceptor já tenta refresh antes de entregar um 401.
+              // Não derrubamos a sessão por erro transitório 5xx/rede.
+              if (error instanceof HttpErrorResponse && error.status === 401) {
+                hubSession.clearSession();
+                clearAuthState(store);
+              }
 
               return of(null);
             }),

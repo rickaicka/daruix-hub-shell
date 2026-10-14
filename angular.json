@@ -65,6 +65,8 @@
               }
             ],
             "styles": [
+
+              "node_modules/sweetalert2/dist/sweetalert2.min.css",
               "src/styles.scss"
             ],
             "polyfills": [

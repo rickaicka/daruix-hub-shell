@@ -41,3 +41,8 @@ testem.log
 .DS_Store
 Thumbs.db
 /public/remotes/
+
+# Electron
+desktop/node_modules/
+desktop/web/
+desktop/release/

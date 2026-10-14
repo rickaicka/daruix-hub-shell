@@ -17,11 +17,15 @@ module.exports = withNativeFederation({
     },
   },
 
+  features: {
+    ignoreUnusedDeps: true,
+  },
+
   skip: [
     'rxjs/ajax',
     'rxjs/fetch',
     'rxjs/testing',
     'rxjs/webSocket',
-    "@capacitor/android",
+    '@capacitor/android',
   ],
 });

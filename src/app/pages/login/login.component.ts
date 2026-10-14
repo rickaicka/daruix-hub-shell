@@ -24,8 +24,7 @@ import {
   LucideUserRound
 } from '@lucide/angular';
 import { Platform } from '@ionic/angular';
-
-import { AuthStore } from '../../core/auth/store/auth.store';
+import {AuthStore} from '../../core/auth/store/auth.store';
 
 type LoginFormModel = {
   username: string;

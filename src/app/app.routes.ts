@@ -2,8 +2,6 @@ import { Routes } from '@angular/router';
 import { loadRemoteModule } from '@angular-architects/native-federation';
 import { hubAuthGuard } from '@daruix/hub-auth';
 
-const remoteHost = window.location.hostname;
-
 export const routes: Routes = [
   {
     path: 'login',
@@ -22,6 +20,7 @@ export const routes: Routes = [
     children: [
       {
         path: 'dashboard',
+
         loadComponent: () =>
           import('./pages/hub-dashboard/hub-dashboard.component').then(
             ({ HubDashboardComponent }) => HubDashboardComponent,
@@ -30,12 +29,22 @@ export const routes: Routes = [
       {
         path: 'remessas',
         loadChildren: () =>
-          loadRemoteModule({
-            remoteName: 'remessas',
-            remoteEntry: `http://${remoteHost}:4301/remoteEntry.json`,
-            exposedModule: './Routes',
-          }).then(
-            (remoteModule) => remoteModule.REMESSAS_ROUTES,
+          loadRemoteModule('remessas', './Routes').then(
+            (m) => m.REMESSAS_ROUTES,
+          ),
+      },
+      {
+        path: 'obras',
+        loadChildren: () =>
+          loadRemoteModule('obras', './Routes').then(
+            (m) => m.OBRAS_ROUTES,
+          ),
+      },
+      {
+        path: 'gestao-administrativa',
+        loadChildren: () =>
+          loadRemoteModule('gestao-administrativa', './Routes').then(
+            (m) => m.CADASTROS_ROUTES,
           ),
       },
       {

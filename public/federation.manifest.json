@@ -1,3 +1,5 @@
 {
-  "remessas": "./remotes/remessas/remoteEntry.json"
+  "remessas": "./remotes/remessas/remoteEntry.json",
+  "obras": "./remotes/obras/remoteEntry.json",
+  "gestao-administrativa": "./remotes/cadastros/remoteEntry.json"
 }

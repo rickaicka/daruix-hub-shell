@@ -1,7 +1,9 @@
 <section class="hub-dashboard">
   @if (isDesktop()) {
     <section class="hub-dashboard__title">
-      <h1 class="gothic-xxgl bolder-font">Aplicativos</h1>
+      <h1 class="gothic-xxgl bolder-font">
+        Aplicativos
+      </h1>
 
       <p class="quicksand-m">
         Encontre e acesse todos os módulos do Daruix Hub
@@ -10,33 +12,51 @@
 
     <section class="hub-dashboard__apps-container">
       @if (onlyFavorites().length > 0) {
-
         <article class="favorites-wrapper">
-
-          <h2 class="gothic-x bolder-font">Favoritos</h2>
+          <h2 class="gothic-x bolder-font">
+            Favoritos
+          </h2>
 
           <section class="favs">
-            @for (favorite of onlyFavorites(); track favorite.item.slug) {
+            @for (
+              favorite of onlyFavorites();
+              track favorite.item.slug
+              ) {
               <drx-card
                 size="small"
-                [moduloColor]="moduleIconColor(favorite.module)"
+                [moduloColor]="
+                  moduleIconColor(
+                    favorite.module
+                  )
+                "
                 [icon]="favorite.module.icone"
                 [title]="favorite.item.nome"
                 [favorite]="favorite.item.favorito"
                 [favoritable]="favorite.item.favoritavel"
-                (favoriteChange)="toggleFavorite($event, favorite.item)"
+                [routerLink]="[`/hub/${favorite.item.modulo_slug}/${favorite.item.rota}`]"
+                (favoriteChange)="
+                  toggleFavorite(
+                    $event,
+                    favorite.item
+                  )
+                "
               ></drx-card>
-
             }
           </section>
         </article>
       }
 
-      <h2 class="gothic-x bolder-font">Menu Principal</h2>
+      <h2 class="gothic-x bolder-font">
+        Menu Principal
+      </h2>
 
       <section class="all">
-        @for (modulo of userModules(); track modulo.slug) {
-          @let children = moduleFeatures(modulo);
+        @for (
+          modulo of userModules();
+          track modulo.slug
+          ) {
+          @let children =
+            moduleFeatures(modulo);
 
           @if (modulo.desktop_enabled) {
             <article class="all__card">
@@ -44,25 +64,45 @@
                 <button
                   type="button"
                   class="all__module"
-                  (click)="navigateRoute(modulo.rota)"
+                  (click)="
+                    navigateRoute(
+                      modulo.rota,
+                      modulo
+                    )
+                  "
                 >
                   <span
                     class="all__module-icon"
-                    [style.--module-icon-color]="moduleIconColor(modulo)"
+                    [style.--module-icon-color]="
+                      moduleIconColor(modulo)
+                    "
                   >
-                    <app-hub-icon [name]="modulo.icone" />
+                    <app-hub-icon
+                      [name]="modulo.icone"
+                    />
                   </span>
 
                   <span class="all__module-info">
-                    <strong class="quicksand-m bolder-font">
+                    <strong
+                      class="quicksand-m bolder-font"
+                    >
                       {{ modulo.nome }}
                     </strong>
 
-                    <span class="all__module-platforms quicksand-sm">
+                    <span
+                      class="all__module-platforms quicksand-sm"
+                    >
                       Web
 
-                      @if (isVisibleOnMobile(modulo)) {
-                        <span aria-hidden="true">•</span>
+                      @if (
+                        isVisibleOnMobile(modulo)
+                        ) {
+                        <span
+                          aria-hidden="true"
+                        >
+                          •
+                        </span>
+
                         Mobile
                       }
                     </span>
@@ -70,81 +110,28 @@
                 </button>
               </header>
 
-              <div class="all__children">
-                @if (children.length > 0) {
-                  @for (child of children.slice(0, 5); track child.slug) {
-                    <div class="all__child">
-                      <button
-                        type="button"
-                        class="all__child-link"
-                        (click)="navigateRoute(child.rota)"
-                      >
-                        <span class="all__child-arrow" aria-hidden="true">
-                          ›
-                        </span>
-
-                        <span class="all__child-name quicksand-sm">
-                          {{ child.nome }}
-                        </span>
-                      </button>
-
-                      <button
-                        type="button"
-                        class="all__child-favorite"
-                        [class.all__child-favorite--active]="itemIsFavorite(child)"
-                        [attr.aria-pressed]="itemIsFavorite(child)"
-                        [attr.aria-label]="
-                          itemIsFavorite(child)
-                            ? 'Remover dos favoritos'
-                            : 'Adicionar aos favoritos'
-                        "
-                        [title]="
-                          itemIsFavorite(child)
-                            ? 'Remover dos favoritos'
-                            : 'Adicionar aos favoritos'
-                        "
-                        (click)="toggleFavoriteFromButton($event, child)"
-                      >
-                        <app-hub-icon
-                          name="favorito"
-                          action
-                          [class.is-filled]="itemIsFavorite(child)"
-                        />
-                      </button>
-                    </div>
-                  }
-                } @else {
-                  <div class="all__child all__child--single">
-                    <button
-                      type="button"
-                      class="all__child-link"
-                      (click)="navigateRoute(modulo.rota)"
-                    >
-                      <span class="all__child-arrow" aria-hidden="true">
-                        ›
-                      </span>
-
-                      <span class="all__child-name quicksand-sm">
-                        Acessar {{ modulo.nome }}
-                      </span>
-                    </button>
-                  </div>
-                }
-              </div>
-
               <footer class="all__footer">
                 <button
                   type="button"
                   class="all__see-all quicksand-sm bolder-font"
-                  (click)="navigateRoute(modulo.rota)"
+                  (click)="
+                    navigateRoute(
+                      modulo.rota
+                    )
+                  "
                 >
-                  @if (children.length > 0) {
-                    Ver todos ({{ children.length }})
+                  @if (
+                    children.length > 0
+                    ) {
+                    Ver todos
+                      ({{ children.length }})
                   } @else {
                     Abrir módulo
                   }
 
-                  <span aria-hidden="true">›</span>
+                  <span aria-hidden="true">
+                    ›
+                  </span>
                 </button>
               </footer>
             </article>
@@ -155,22 +142,34 @@
   } @else {
     <section class="mobile-dashboard">
       <header class="mobile-dashboard__header">
-        <h1 class="gothic-x bolder-font">Aplicativos</h1>
+        <h1 class="gothic-x bolder-font">
+          Aplicativos
+        </h1>
 
         <p class="quicksand-sm">
           Acesse rapidamente os módulos disponíveis no Daruix Hub.
         </p>
       </header>
 
-      <ion-card class="hub-card quick-access-card">
+      <ion-card
+        class="hub-card quick-access-card"
+      >
         <ion-card-content>
           <header class="card-header">
             <div class="card-header__title">
-              <h2 class="quicksand-r bolder-font">Acesso rápido</h2>
+              <h2
+                class="quicksand-r bolder-font"
+              >
+                Acesso rápido
+              </h2>
 
               <span class="quicksand-sm">
                 {{ mobileModulos().length }}
-                @if (mobileModulos().length === 1) {
+
+                @if (
+                  mobileModulos().length ===
+                  1
+                  ) {
                   módulo disponível
                 } @else {
                   módulos disponíveis
@@ -178,14 +177,23 @@
               </span>
             </div>
 
-            @if (mobileModulos().length > mobilePreviewLimit) {
+            @if (
+              mobileModulos().length >
+              mobilePreviewLimit
+              ) {
               <button
                 type="button"
                 class="see-all-button quicksand-sm bolder-font"
-                [attr.aria-expanded]="showAllMobile()"
-                (click)="toggleMobileModules()"
+                [attr.aria-expanded]="
+                  showAllMobile()
+                "
+                (click)="
+                  toggleMobileModules()
+                "
               >
-                @if (showAllMobile()) {
+                @if (
+                  showAllMobile()
+                  ) {
                   Ver menos
                 } @else {
                   Ver todos
@@ -194,23 +202,48 @@
             }
           </header>
 
-          @if (visibleMobileModules().length > 0) {
+          @if (
+            visibleMobileModules()
+              .length > 0
+            ) {
             <ion-grid class="quick-grid">
               <ion-row>
-                @for (item of visibleMobileModules(); track item.slug) {
+                @for (
+                  item of
+                    visibleMobileModules();
+                  track item.slug
+                  ) {
                   <ion-col size="4">
                     <button
                       type="button"
                       class="quick-item"
-                      [attr.aria-label]="'Abrir módulo ' + item.nome"
-                      (click)="navigateRoute(item.rota)"
+                      [attr.aria-label]="
+                        'Abrir módulo ' +
+                        item.nome
+                      "
+                      (click)="
+                        navigateRoute(
+                          item.rota,
+                          item
+                        )
+                      "
                     >
                       <span
                         class="quick-icon-container"
-                        [style.--module-icon-color]="moduleIconColor(item)"
+                        [style.--module-icon-color]="
+                          moduleIconColor(
+                            item
+                          )
+                        "
                       >
-                        <span class="quick-icon">
-                          <app-hub-icon [name]="item.icone" />
+                        <span
+                          class="quick-icon"
+                        >
+                          <app-hub-icon
+                            [name]="
+                              item.icone
+                            "
+                          />
                         </span>
                       </span>
 
@@ -226,12 +259,20 @@
               </ion-row>
             </ion-grid>
           } @else {
-            <div class="mobile-empty-state">
-              <span class="mobile-empty-state__icon">
-                <app-hub-icon name="aplicativos" />
+            <div
+              class="mobile-empty-state"
+            >
+              <span
+                class="mobile-empty-state__icon"
+              >
+                <app-hub-icon
+                  name="aplicativos"
+                />
               </span>
 
-              <strong class="quicksand-m bolder-font">
+              <strong
+                class="quicksand-m bolder-font"
+              >
                 Nenhum aplicativo disponível
               </strong>
 
