@@ -1,4 +1,4 @@
-name: Publicar imagem Docker - daruix-hub-shell
+name: Publicar e atualizar Docker - daruix-hub-shell
 
 on:
   push:
@@ -12,24 +12,29 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: rickaicka/daruix-hub-shell
 
+permissions:
+  contents: read
+
+concurrency:
+  group: daruix-hub-shell-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build-and-push:
-    name: Build e publicação
+    name: Build e publicacao
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
       packages: write
-
     steps:
-      - name: Baixar código
-        uses: actions/checkout@v6
+      - name: Baixar codigo
+        uses: actions/checkout@v4
 
       - name: Configurar Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@v3
 
       - name: Autenticar no GHCR
-        uses: docker/login-action@v4
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -37,7 +42,7 @@ jobs:
 
       - name: Gerar tags da imagem
         id: metadata
-        uses: docker/metadata-action@v6
+        uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
@@ -46,7 +51,7 @@ jobs:
             type=sha,prefix=sha-
 
       - name: Compilar e publicar imagem
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
@@ -55,3 +60,42 @@ jobs:
           labels: ${{ steps.metadata.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy-vps:
+    name: Atualizar Shell na VPS
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    # O deploy utiliza latest; tags de release sao publicadas sem reiniciar producao.
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    steps:
+      - name: Configurar acesso SSH
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          set -eu
+          test -n "$VPS_SSH_KEY"
+          test -n "$VPS_KNOWN_HOSTS"
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Pull e recriacao do container Shell
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          set -eu
+          test -n "$VPS_HOST"
+          test -n "$VPS_USER"
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
+            "$VPS_USER@$VPS_HOST" 'sh -se' <<'REMOTE'
+          cd /opt/daruix-hub
+          docker compose -f compose.yml -f compose.source.yml pull shell
+          docker compose -f compose.yml -f compose.source.yml up -d --no-deps --force-recreate shell
+          docker compose -f compose.yml -f compose.source.yml ps shell
+          REMOTE
