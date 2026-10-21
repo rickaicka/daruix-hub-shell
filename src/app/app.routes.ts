@@ -48,6 +48,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'ordens-compra',
+        loadChildren: () =>
+          loadRemoteModule('ordens-compra', './Routes').then(
+            (m) => m.ORDENS_COMPRA_ROUTES,
+          ),
+      },
+      {
         path: '',
         pathMatch: 'full',
         redirectTo: 'dashboard',

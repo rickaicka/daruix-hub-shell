@@ -9,8 +9,9 @@ RUN npm ci --no-audit --no-fund
 
 COPY . .
 
-RUN npm run build:shell \
-    && test -f /app/dist/daruix-hub-shell/index.html
+RUN npm run build:web \
+    && test -f /app/dist/daruix-hub-shell/index.html \
+    && test ! -e /app/dist/daruix-hub-shell/remotes
 
 
 FROM nginx:alpine

@@ -8,3 +8,6 @@ ios
 .env
 .env.*
 *.log
+
+# Builds dos MFEs pertencem aos containers próprios no deploy web.
+public/remotes
