@@ -66,9 +66,13 @@
 
         @if (userMenuOpen()) {
           <div id="hub-user-options" class="user-dropdown">
-            <button type="button" class="button-reset user-dropdown__item quicksand-r"
+            <button type="button" class="button-reset user-dropdown__item"
               (click)="selectLogout()">
+              <span class=" drx-font-gothic-body-md bold-font">
+
               Sair
+              </span>
+              <app-hub-icon [name]="'log-out'"></app-hub-icon>
             </button>
           </div>
         }

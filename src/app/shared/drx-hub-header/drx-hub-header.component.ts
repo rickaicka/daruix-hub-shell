@@ -33,6 +33,7 @@ import {
   HubModulo,
   HubUser
 } from '@daruix/hub-auth';
+import {HubIconComponent} from '@daruix/hub-ui';
 
 @Component({
   selector: 'app-drx-hub-header',
@@ -41,7 +42,8 @@ import {
     LucideMenu,
     LucideBell,
     LucideUser,
-    LucideChevronDown
+    LucideChevronDown,
+    HubIconComponent
   ],
   templateUrl: './drx-hub-header.component.html',
   styleUrl: './drx-hub-header.component.scss'

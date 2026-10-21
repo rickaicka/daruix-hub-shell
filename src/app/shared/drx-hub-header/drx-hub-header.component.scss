@@ -515,11 +515,13 @@
 }
 
 .user-dropdown__item {
-  display: block;
+  display: flex;
   width: 100%;
   padding: 10px 12px;
   border-radius: 6px;
   color: var(--drx-red-base, #c00d0e);
+  justify-content: space-between;
+  align-items: center;
 
   &:hover,
   &:focus-visible {
