@@ -1,9 +1,13 @@
 import {
   Component,
+  ElementRef,
+  HostListener,
   computed,
   inject,
   input,
-  output
+  output,
+  signal,
+  viewChild
 } from '@angular/core';
 import {
   NavigationEnd,
@@ -51,6 +55,43 @@ export class DrxHubHeaderComponent {
   sidebarCollapsed = input<boolean>(false);
 
   menuToggle = output<void>();
+  readonly logoutSelected = output<void>();
+  readonly userMenuOpen = signal(false);
+  private readonly userMenu = viewChild<ElementRef<HTMLElement>>('userMenu');
+  private readonly userMenuTrigger = viewChild<ElementRef<HTMLButtonElement>>('userMenuTrigger');
+
+  toggleUserMenu(): void {
+    this.userMenuOpen.update((open) => !open);
+  }
+
+  selectLogout(): void {
+    this.userMenuOpen.set(false);
+    this.logoutSelected.emit();
+  }
+
+  @HostListener('document:click', ['$event'])
+  closeUserMenuOnOutsideClick(event: MouseEvent): void {
+    const container = this.userMenu()?.nativeElement;
+    if (this.userMenuOpen() && container && !container.contains(event.target as Node)) {
+      this.userMenuOpen.set(false);
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  closeUserMenuOnEscape(): void {
+    if (this.userMenuOpen()) {
+      this.userMenuOpen.set(false);
+      this.userMenuTrigger()?.nativeElement.focus();
+    }
+  }
+
+  closeUserMenuOnFocusOut(event: FocusEvent): void {
+    const container = this.userMenu()?.nativeElement;
+    if (container && !container.contains(event.relatedTarget as Node | null)) {
+      this.userMenuOpen.set(false);
+    }
+  }
+
 
   /**
    * Rotas em que a apresentação do usuário deve aparecer.

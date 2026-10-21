@@ -1,4 +1,6 @@
 :host {
+  position: relative;
+  z-index: 300;
   display: block;
 
   width: 100%;
@@ -487,5 +489,40 @@
         max-width: 145px;
       }
     }
+  }
+}
+
+.header-hub-container__perfil {
+  position: relative;
+}
+
+.user-more[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 1;
+  min-width: 160px;
+  padding: 6px;
+  color: #222;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+.user-dropdown__item {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  color: var(--drx-red-base, #c00d0e);
+
+  &:hover,
+  &:focus-visible {
+    background: #f5f5f5;
   }
 }

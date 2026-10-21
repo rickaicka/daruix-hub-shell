@@ -11,7 +11,6 @@
       [compactLogoSrc]="'/assets/D_solo.png'"
       (brandSelected)="navigateRoute('dashboard')"
       (itemSelected)="handleSidebarSelection($event)"
-      (logoutSelected)="logout()"
     />
 
     <section class="hub-content">
@@ -20,6 +19,7 @@
         [isMobile]="isMobile()"
         [sidebarCollapsed]="sidebarCollapsed()"
         (menuToggle)="toggleSidebar()"
+        (logoutSelected)="logout()"
       />
 
       <div class="grid-container">

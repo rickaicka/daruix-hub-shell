@@ -30,7 +30,8 @@
         </button>
       </section>
 
-      <section class="header-hub-container__perfil">
+      <section class="header-hub-container__perfil" #userMenu
+        (focusout)="closeUserMenuOnFocusOut($event)">
         <div class="user-circle">
           <svg lucideUser></svg>
         </div>
@@ -54,10 +55,23 @@
         <button
           class="button-reset user-more"
           type="button"
-          aria-label="Abrir opções do usuário"
+          #userMenuTrigger
+          aria-label="Opções do usuário"
+          [attr.aria-expanded]="userMenuOpen()"
+          [attr.aria-controls]="userMenuOpen() ? 'hub-user-options' : null"
+          (click)="toggleUserMenu()"
         >
           <svg lucideChevronDown></svg>
         </button>
+
+        @if (userMenuOpen()) {
+          <div id="hub-user-options" class="user-dropdown">
+            <button type="button" class="button-reset user-dropdown__item quicksand-r"
+              (click)="selectLogout()">
+              Sair
+            </button>
+          </div>
+        }
       </section>
     </section>
   </header>
