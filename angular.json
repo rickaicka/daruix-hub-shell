@@ -29,6 +29,9 @@
             "development": {
               "target": "daruix-hub-shell:esbuild:development",
               "dev": true
+            },
+            "mobile": {
+              "target": "daruix-hub-shell:esbuild:production,mobile"
             }
           },
           "defaultConfiguration": "production"
@@ -65,7 +68,6 @@
               }
             ],
             "styles": [
-
               "node_modules/sweetalert2/dist/sweetalert2.min.css",
               "src/styles.scss"
             ],
@@ -106,6 +108,14 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "mobile": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.mobile.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
