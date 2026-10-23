@@ -17,14 +17,12 @@
     "build:mfe:cadastros": "npm --prefix ../mfe-daruix-cadastros run build",
     "build:mfe:remessas": "npm --prefix ../daruix-mfe-remessas run build",
     "build:mfe:ordens-compra": "npm --prefix ../mfe-daruix-ordens-compra run build",
-    "build:mfe:ordens-compra:mobile": "npm --prefix ../mfe-daruix-ordens-compra run build:mobile",
     "sync:mfes": "npm run sync:mfe:obras && npm run sync:mfe:cadastros && npm run sync:mfe:remessas && npm run sync:mfe:ordens-compra",
     "sync:mfe:obras": "node -e \"const fs=require('node:fs');const source='../mfe-daruix-obras/dist/mfe-daruix-obras';const target='public/remotes/obras';if(!fs.existsSync(source))throw new Error('Build do MFE nao encontrado: '+source);fs.rmSync(target,{recursive:true,force:true});fs.mkdirSync(target,{recursive:true});fs.cpSync(source,target,{recursive:true});\"",
     "sync:mfe:cadastros": "node -e \"const fs=require('node:fs');const source='../mfe-daruix-cadastros/dist/mfe-daruix-cadastros';const target='public/remotes/cadastros';if(!fs.existsSync(source))throw new Error('Build do MFE nao encontrado: '+source);fs.rmSync(target,{recursive:true,force:true});fs.mkdirSync(target,{recursive:true});fs.cpSync(source,target,{recursive:true});\"",
     "sync:mfe:remessas": "node -e \"const fs=require('node:fs');const source='../daruix-mfe-remessas/dist/daruix-mfe-remessas';const target='public/remotes/remessas';if(!fs.existsSync(source))throw new Error('Build do MFE nao encontrado: '+source);fs.rmSync(target,{recursive:true,force:true});fs.mkdirSync(target,{recursive:true});fs.cpSync(source,target,{recursive:true});\"",
     "sync:mfe:ordens-compra": "node -e \"const fs=require('node:fs');const source='../mfe-daruix-ordens-compra/dist/mfe-daruix-ordens-compra';const target='public/remotes/ordens-compra';if(!fs.existsSync(source))throw new Error('Build do MFE nao encontrado: '+source);fs.rmSync(target,{recursive:true,force:true});fs.mkdirSync(target,{recursive:true});fs.cpSync(source,target,{recursive:true});\"",
     "build:mobile": "npm run build:bundled",
-    "build:mfes:mobile": "npm run build:mfe:obras && npm run build:mfe:cadastros && npm run build:mfe:remessas && npm run build:mfe:ordens-compra:mobile",
     "test": "ng test",
     "test:ci": "ng test --watch=false",
     "android:sync": "npm run build:mobile && npx cap sync android",
@@ -46,8 +44,11 @@
     "desktop:dist:linux": "npm run desktop:build && npm --prefix desktop run dist:linux",
     "desktop:dist:mac": "npm run desktop:build && npm --prefix desktop run dist:mac",
     "build:web": "node scripts/build-shell-web.mjs",
-    "build:bundled": "npm run build:mfes && npm run sync:mfes && ng build --configuration=mobile && npm run sync:mobile",
-    "sync:mobile": "node -e \"const fs=require('node:fs');const source='dist/daruix-hub-shell';const target='www';if(!fs.existsSync(source+'/index.html'))throw new Error('Build do Shell nao encontrado em '+source);fs.rmSync(target,{recursive:true,force:true});fs.cpSync(source,target,{recursive:true});\""
+    "build:bundled": "npm run build:mfes:mobile && npm run sync:mfes && ng build --configuration=mobile && npm run sync:mobile",
+    "sync:mobile": "node -e \"const fs=require('node:fs');const source='dist/daruix-hub-shell';const target='www';if(!fs.existsSync(source+'/index.html'))throw new Error('Build do Shell nao encontrado em '+source);fs.rmSync(target,{recursive:true,force:true});fs.cpSync(source,target,{recursive:true});\"",
+    "build:mfe:remessas:mobile": "npm --prefix ../daruix-mfe-remessas run build:mobile",
+    "build:mfe:ordens-compra:mobile": "npm --prefix ../mfe-daruix-ordens-compra run build:mobile",
+    "build:mfes:mobile": "npm run build:mfe:obras && npm run build:mfe:cadastros && npm run build:mfe:remessas:mobile && npm run build:mfe:ordens-compra:mobile"
   },
   "prettier": {
     "overrides": [

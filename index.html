@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Daruix Hub</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Science+Gothic:wght@100..900&display=swap" rel="stylesheet">
+  <style>
+    #daruix-startup-loader {
+      position: fixed; inset: 0; z-index: 2147483647;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 25px; background: #15151d; color: #eeeef3;
+      font-family: Arial, sans-serif; padding: 24px; box-sizing: border-box;
+    }
+    #daruix-startup-loader .startup-logo { width: 178px; max-width: 65vw; height: auto; object-fit: contain; }
+    #daruix-startup-loader .startup-spinner { width: 30px; height: 30px;
+      border: 3px solid rgba(255,255,255,.18); border-top-color: #f4141f;
+      border-radius: 50%; animation: daruix-spin .8s linear infinite;
+    }
+    #daruix-startup-loader .startup-label { margin: 0; font-size: 13px; letter-spacing: .02em; color: #bebec8; }
+    @keyframes daruix-spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { #daruix-startup-loader .startup-spinner { animation-duration: 2s; } }
+  </style>
+</head>
+<body>
+  <div id="daruix-startup-loader" role="status" aria-live="polite" aria-label="Carregando Daruix Hub">
+    <img class="startup-logo" src="/assets/daruix-logo-startup.png" alt="Daruix Engenharia">
+    <div class="startup-spinner" aria-hidden="true"></div>
+    <p class="startup-label">Carregando seu ambiente...</p>
+  </div>
+  <app-root></app-root>
+</body>
+</html>
