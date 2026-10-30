@@ -23,6 +23,15 @@
       />
 
       <div class="grid-container">
+        @if (pageBreadcrumb().length) {
+          <div class="hub-page-context">
+            <drx-breadcrumb [items]="pageBreadcrumb()" />
+            <h1 class="drx-font-gothic-title-md bold-font">{{ pageTitle() }}</h1>
+          @if (pageSubtitle()) {
+            <p class="quicksand-m">{{ pageSubtitle() }}</p>
+          }
+          </div>
+        }
         <router-outlet />
       </div>
     </section>
@@ -185,6 +194,15 @@
     </div>
 
     <ion-content class="hub-mobile-content">
+      @if (pageBreadcrumb().length) {
+        <div class="hub-page-context hub-page-context--mobile">
+          <drx-breadcrumb [items]="pageBreadcrumb()" />
+          <h1 class="hub-page-context__title">{{ pageTitle() }}</h1>
+          @if (pageSubtitle()) {
+            <p class="hub-page-context__subtitle">{{ pageSubtitle() }}</p>
+          }
+        </div>
+      }
       <router-outlet />
     </ion-content>
 

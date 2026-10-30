@@ -21,12 +21,14 @@
           class="button-reset notification-button"
           type="button"
           aria-label="Notificações"
+          [attr.aria-expanded]="notificationsOpen()"
+          (click)="toggleNotifications()"
         >
           <svg lucideBell></svg>
 
-          <span class="notificacao_qttd quicksand-sm">
-            99
-          </span>
+          @if (unreadCount() > 0) {
+            <span class="notificacao_qttd quicksand-sm">{{ unreadCount() > 99 ? '99+' : unreadCount() }}</span>
+          }
         </button>
       </section>
 
@@ -39,13 +41,13 @@
         <div class="user-perfil">
           <ul>
             <li>
-              <p class="quicksand-r bolder-font">
+              <p class="quicksand-r bolder-font user-perfil__name">
                 {{ userLogged()?.nome || 'Usuário' }}
               </p>
             </li>
 
             <li>
-              <p class="quicksand-m">
+              <p class="quicksand-m user-perfil__group">
                 {{ userLogged()?.grupo || 'Sem grupo' }}
               </p>
             </li>
@@ -68,9 +70,8 @@
           <div id="hub-user-options" class="user-dropdown">
             <button type="button" class="button-reset user-dropdown__item"
               (click)="selectLogout()">
-              <span class=" drx-font-gothic-body-md bold-font">
-
-              Sair
+              <span class="user-dropdown__label drx-font-gothic-body-md bold-font">
+                Sair
               </span>
               <app-hub-icon [name]="'log-out'"></app-hub-icon>
             </button>
@@ -107,12 +108,14 @@
           class="icon-button notification-button"
           type="button"
           aria-label="Notificações"
+          [attr.aria-expanded]="notificationsOpen()"
+          (click)="toggleNotifications()"
         >
           <svg lucideBell></svg>
 
-          <span class="quicksand-sm">
-            3
-          </span>
+          @if (unreadCount() > 0) {
+            <span class="notificacao_qttd quicksand-sm">{{ unreadCount() > 99 ? '99+' : unreadCount() }}</span>
+          }
         </button>
       </div>
 
@@ -129,4 +132,65 @@
       }
     </header>
   </div>
+}
+
+@if (notificationsOpen()) {
+  <div class="hub-notice-backdrop" (click)="notificationsOpen.set(false)"></div>
+  <section class="hub-notice-popover" role="dialog" aria-label="Notificações do Hub">
+    <header class="hub-notice-popover__header">
+      <div class="hub-notice-popover__heading">
+        <strong class="gothic-r bolder-font">Notificações</strong>
+        <span class="quicksand-sm hub-notice-popover__count">
+          {{ unreadCount() > 0 ? (unreadCount() + ' não lida' + (unreadCount() > 1 ? 's' : '')) : 'Central do Hub' }}
+        </span>
+      </div>
+
+      <button
+        type="button"
+        class="button-reset hub-notice-popover__close"
+        (click)="notificationsOpen.set(false)"
+        aria-label="Fechar notificações"
+      >
+        ×
+      </button>
+    </header>
+
+    <div class="hub-notice-popover__body">
+      @if (notificationsError()) {
+        <div class="hub-notice-state hub-notice-state--error" role="alert">
+          <p class="quicksand-r">Não foi possível carregar as notificações.</p>
+          <button type="button" class="button-reset hub-notice-state__action" (click)="refreshNotifications()">
+            Tentar novamente
+          </button>
+        </div>
+      } @else {
+        @for (notice of notifications(); track notice.id) {
+          <button
+            type="button"
+            class="hub-notice-row"
+            [class.hub-notice-row--unread]="!notice.read"
+            (click)="openNotification(notice)"
+          >
+            <div class="hub-notice-row__topline">
+              <strong class="gothic-r bolder-font">{{ notice.title }}</strong>
+              @if (!notice.read) {
+                <span class="hub-notice-row__pill quicksand-xs">Nova</span>
+              }
+            </div>
+
+            <span class="hub-notice-row__message quicksand-r">{{ notice.message }}</span>
+
+            <div class="hub-notice-row__meta quicksand-sm">
+              <small>{{ notice.created_at | date:'dd/MM/yyyy HH:mm' }}</small>
+            </div>
+          </button>
+        } @empty {
+          <div class="hub-notice-state hub-notice-state--empty">
+            <p class="gothic-r bolder-font">Nenhuma notificação pendente.</p>
+            <span class="quicksand-r">Quando houver novas ações do Hub, elas aparecerão aqui.</span>
+          </div>
+        }
+      }
+    </div>
+  </section>
 }

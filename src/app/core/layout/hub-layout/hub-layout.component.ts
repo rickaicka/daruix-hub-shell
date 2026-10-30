@@ -19,7 +19,9 @@ import {
   DrxSidebarComponent,
   DrxSidebarFeature,
   DrxSidebarModule,
-  DrxSidebarSelection
+  DrxSidebarSelection,
+  DrxBreadcrumbComponent,
+  type DrxBreadcrumbItem
 } from '@daruix/hub-ui';
 
 import { AuthStore } from '../../auth/store/auth.store';
@@ -35,6 +37,7 @@ import { DrxHubHeaderComponent } from '../../../shared/drx-hub-header/drx-hub-he
     DrxHubHeaderComponent,
     HubIconComponent,
     DrxSidebarComponent,
+    DrxBreadcrumbComponent,
     IonContent
   ],
   templateUrl: './hub-layout.component.html',
@@ -87,6 +90,86 @@ export class HubLayoutComponent {
       this.toSidebarModule(module, moduleIndex)
     )
   );
+
+  /** Resolve os rótulos a partir dos módulos/recursos devolvidos pelo BFF. */
+  readonly pageBreadcrumb = computed<readonly DrxBreadcrumbItem[]>(() => {
+    const current = this.currentUrl();
+    if (current === '/hub' || current === '/hub/dashboard') return [];
+    type Match = { depth: number; length: number; items: DrxBreadcrumbItem[] };
+    const matchState: { best: Match | null } = { best: null };
+    const consider = (route: string | undefined, items: DrxBreadcrumbItem[], depth: number) => {
+      if (!route) return;
+      const normalized = this.normalizeRoute(route);
+      if (current !== normalized && !current.startsWith(`${normalized}/`)) return;
+      if (!matchState.best || normalized.length > matchState.best.length || (normalized.length === matchState.best.length && depth > matchState.best.depth)) {
+        matchState.best = { depth, length: normalized.length, items };
+      }
+    };
+    for (const module of this.sidebarItems()) {
+      const moduleItem: DrxBreadcrumbItem = { label: module.label, route: module.route };
+      consider(module.route, [moduleItem], 1);
+      for (const category of module.categories ?? []) {
+        const categoryItem: DrxBreadcrumbItem = { label: category.label };
+        for (const feature of category.features ?? []) {
+          consider(feature.route, [moduleItem, ...(category.id.endsWith(':general') ? [] : [categoryItem]), { label: feature.label, route: feature.route }], 3);
+        }
+      }
+    }
+    const selected = matchState.best;
+    if (!selected) return [];
+    return [{ label: 'Hub', route: '/hub/dashboard' }, ...selected.items.map((item, index) => index === selected.items.length - 1 ? { label: item.label } : item)];
+  });
+
+  readonly pageTitle = computed(() => this.pageBreadcrumb().at(-1)?.label ?? '');
+
+  /**
+   * Usa a mesma resolução de rotas da sidebar/breadcrumb para localizar
+   * a funcionalidade original no payload da sessão do Hub.
+   * Não cria descrições locais: o texto sempre vem do backend.
+   */
+  readonly pageSubtitle = computed(() => {
+    const current = this.currentUrl();
+    let matchedLength = -1;
+    let description = '';
+
+    const consider = (node: any, routeValue: string): void => {
+      if (!routeValue) return;
+      const route = this.normalizeRoute(routeValue);
+      if (current !== route && !current.startsWith(`${route}/`)) return;
+      if (route.length <= matchedLength) return;
+      matchedLength = route.length;
+      const value =
+        node?.descricao ??
+        node?.descricao_pagina ??
+        node?.description ??
+        node?.page_description ??
+        node?.subtitulo;
+      description = typeof value === 'string' ? value.trim() : '';
+    };
+
+    for (const module of this.modulos()) {
+      const moduleBase = this.resolveModuleBaseRoute(module);
+      consider(module, moduleBase);
+
+      // A hierarquia do Hub é módulo -> categoria -> funcionalidade.
+      // A rota da funcionalidade é sempre resolvida contra a rota do módulo,
+      // exatamente como em toSidebarFeature().
+      const visit = (nodes: any[]): void => {
+        for (const node of nodes) {
+          const explicit = this.explicitRoute(node);
+          if (explicit) {
+            consider(node, this.resolveFeatureRoute(explicit, moduleBase));
+          }
+          const children = this.moduleChildren(node);
+          if (children.length) visit(children);
+        }
+      };
+
+      visit(this.moduleChildren(module));
+    }
+
+    return description;
+  });
 
   constructor() {
     this.authStore.syncFromSession();

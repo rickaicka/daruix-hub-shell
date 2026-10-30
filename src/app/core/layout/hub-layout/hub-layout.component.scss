@@ -500,3 +500,28 @@
     transition: none;
   }
 }
+
+/* Contexto de navegação centralizado no Shell */
+.hub-page-context {
+  flex: 0 0 auto;
+  padding: 16px 24px 12px;
+  min-width: 0;
+  background: #f7f8fb;
+}
+.hub-page-context__title {
+  margin: 8px 0 0;
+  font-family: 'Gothic', 'Arial', sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #20253b;
+}
+.hub-page-context--mobile { padding: 12px 16px; }
+
+.hub-page-context__subtitle {
+  margin: 6px 0 0;
+  font-family: 'Quicksand', Arial, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #63708b;
+}

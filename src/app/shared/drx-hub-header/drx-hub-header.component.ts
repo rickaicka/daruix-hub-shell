@@ -1,5 +1,6 @@
 import {
   Component,
+  DestroyRef,
   ElementRef,
   HostListener,
   computed,
@@ -13,9 +14,7 @@ import {
   NavigationEnd,
   Router
 } from '@angular/router';
-import {
-  toSignal
-} from '@angular/core/rxjs-interop';
+import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   filter,
   map,
@@ -33,7 +32,10 @@ import {
   HubModulo,
   HubUser
 } from '@daruix/hub-auth';
+import { DatePipe } from '@angular/common';
 import {HubIconComponent} from '@daruix/hub-ui';
+import { HubNotificationsService, type HubNotification } from './hub-notifications.service';
+import { interval, of, switchMap, catchError } from 'rxjs';
 
 @Component({
   selector: 'app-drx-hub-header',
@@ -43,13 +45,49 @@ import {HubIconComponent} from '@daruix/hub-ui';
     LucideBell,
     LucideUser,
     LucideChevronDown,
-    HubIconComponent
+    HubIconComponent,
+    DatePipe
   ],
   templateUrl: './drx-hub-header.component.html',
   styleUrl: './drx-hub-header.component.scss'
 })
 export class DrxHubHeaderComponent {
   private readonly router = inject(Router);
+  private readonly notificationsApi = inject(HubNotificationsService);
+  private readonly destroyRef = inject(DestroyRef);
+  readonly notifications = signal<HubNotification[]>([]);
+  readonly unreadCount = signal(0);
+  readonly notificationsOpen = signal(false);
+  readonly notificationsError = signal(false);
+
+  constructor() {
+    interval(30000).pipe(startWith(0), switchMap(() => this.notificationsApi.list().pipe(catchError(() => {
+      this.notificationsError.set(true);
+      return of(null);
+    }))), takeUntilDestroyed(this.destroyRef)).subscribe(data => {
+      if (!data) return;
+      this.notificationsError.set(false);
+      this.notifications.set(data.results);
+      this.unreadCount.set(data.unread);
+    });
+  }
+
+  toggleNotifications(): void {
+    this.notificationsOpen.update(value => !value);
+    if (this.notificationsOpen()) this.refreshNotifications();
+  }
+  refreshNotifications(): void {
+    this.notificationsApi.list().subscribe({
+      next: data => { this.notificationsError.set(false); this.notifications.set(data.results); this.unreadCount.set(data.unread); },
+      error: () => this.notificationsError.set(true),
+    });
+  }
+  openNotification(notice: HubNotification): void {
+    this.notificationsApi.markRead(notice.id).subscribe({next: () => this.refreshNotifications()});
+    this.notificationsOpen.set(false);
+    if (notice.route.startsWith('/hub/')) void this.router.navigateByUrl(notice.route);
+  }
+
 
   userLogged = input<HubUser | null>();
   isMobile = input<boolean>(false);
@@ -81,6 +119,7 @@ export class DrxHubHeaderComponent {
 
   @HostListener('document:keydown.escape')
   closeUserMenuOnEscape(): void {
+    this.notificationsOpen.set(false);
     if (this.userMenuOpen()) {
       this.userMenuOpen.set(false);
       this.userMenuTrigger()?.nativeElement.focus();
