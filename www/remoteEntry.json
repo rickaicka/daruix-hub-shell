@@ -3,7 +3,7 @@
   "shared": [
     {
       "packageName": "@angular/common",
-      "outFileName": "_angular_common.kFeBm0-v3n.js",
+      "outFileName": "_angular_common.yyz_WwE4ct.js",
       "requiredVersion": "21.2.20",
       "singleton": true,
       "strictVersion": true,
@@ -11,7 +11,7 @@
     },
     {
       "packageName": "@angular/common/http",
-      "outFileName": "_angular_common_http.ZudxVhL_Cw.js",
+      "outFileName": "_angular_common_http.k-Gzdr_Ll-.js",
       "requiredVersion": "21.2.20",
       "singleton": true,
       "strictVersion": true,
@@ -19,7 +19,7 @@
     },
     {
       "packageName": "@angular/core",
-      "outFileName": "_angular_core.lg1bTXbI5F.js",
+      "outFileName": "_angular_core.g10uNyRp4O.js",
       "requiredVersion": "21.2.20",
       "singleton": true,
       "strictVersion": true,
@@ -27,7 +27,7 @@
     },
     {
       "packageName": "@angular/core/primitives/di",
-      "outFileName": "_angular_core_primitives_di.aWtngUfNVc.js",
+      "outFileName": "_angular_core_primitives_di.XPneVNFf6a.js",
       "requiredVersion": "21.2.20",
       "singleton": true,
       "strictVersion": true,
@@ -35,7 +35,7 @@
     },
     {
       "packageName": "@angular/core/primitives/signals",
-      "outFileName": "_angular_core_primitives_signals.NSJKp1NyXO.js",
+      "outFileName": "_angular_core_primitives_signals.cLXvKD7x6E.js",
       "requiredVersion": "21.2.20",
       "singleton": true,
       "strictVersion": true,
@@ -43,7 +43,7 @@
     },
     {
       "packageName": "@angular/core/rxjs-interop",
-      "outFileName": "_angular_core_rxjs_interop.4-p2M95CQF.js",
+      "outFileName": "_angular_core_rxjs_interop.za_OJ8H0uK.js",
       "requiredVersion": "21.2.20",
       "singleton": true,
       "strictVersion": true,
@@ -51,7 +51,7 @@
     },
     {
       "packageName": "@angular/forms",
-      "outFileName": "_angular_forms.HPVW4ibTHo.js",
+      "outFileName": "_angular_forms.2ZzjAPyhFM.js",
       "requiredVersion": "21.2.20",
       "singleton": true,
       "strictVersion": true,
@@ -59,7 +59,7 @@
     },
     {
       "packageName": "@angular/forms/signals",
-      "outFileName": "_angular_forms_signals.f1Eb6qjoCv.js",
+      "outFileName": "_angular_forms_signals.rm_AinjxM6.js",
       "requiredVersion": "21.2.20",
       "singleton": true,
       "strictVersion": true,
@@ -67,7 +67,7 @@
     },
     {
       "packageName": "@angular/platform-browser",
-      "outFileName": "_angular_platform_browser.U1dqxuq_Ir.js",
+      "outFileName": "_angular_platform_browser.kcMRk3gAra.js",
       "requiredVersion": "21.2.20",
       "singleton": true,
       "strictVersion": true,
@@ -75,7 +75,7 @@
     },
     {
       "packageName": "@angular/router",
-      "outFileName": "_angular_router.y455M88kXs.js",
+      "outFileName": "_angular_router.nl6hR05Mdx.js",
       "requiredVersion": "21.2.20",
       "singleton": true,
       "strictVersion": true,
@@ -83,7 +83,7 @@
     },
     {
       "packageName": "@daruix/hub-auth",
-      "outFileName": "_daruix_hub_auth.Rb7HRaFmAN.js",
+      "outFileName": "_daruix_hub_auth.RgOd_ldC1-.js",
       "requiredVersion": "auto",
       "singleton": true,
       "strictVersion": true,
@@ -91,15 +91,15 @@
     },
     {
       "packageName": "@daruix/hub-ui",
-      "outFileName": "_daruix_hub_ui.Q-KV2Z1ylL.js",
-      "requiredVersion": "D:\\Projects\\Daruix\\daruix-ds\\daruix-hub-ui-3.0.3.tgz",
+      "outFileName": "_daruix_hub_ui.yL_OO7iu44.js",
+      "requiredVersion": "3.0.3",
       "singleton": true,
       "strictVersion": true,
       "version": "3.0.3"
     },
     {
       "packageName": "@ionic/angular",
-      "outFileName": "_ionic_angular.MS2yWA86NK.js",
+      "outFileName": "_ionic_angular.-FFTcGi8Lt.js",
       "requiredVersion": "^8.8.6",
       "singleton": true,
       "strictVersion": true,
@@ -107,7 +107,7 @@
     },
     {
       "packageName": "@ionic/angular/common",
-      "outFileName": "_ionic_angular_common.2w5q9iDvKx.js",
+      "outFileName": "_ionic_angular_common.LrWmMrqBIG.js",
       "requiredVersion": "^8.8.6",
       "singleton": true,
       "strictVersion": true,
@@ -115,7 +115,7 @@
     },
     {
       "packageName": "@ionic/angular/standalone",
-      "outFileName": "_ionic_angular_standalone.469p5vtmAh.js",
+      "outFileName": "_ionic_angular_standalone.fWnjQX170_.js",
       "requiredVersion": "^8.8.6",
       "singleton": true,
       "strictVersion": true,
@@ -123,7 +123,7 @@
     },
     {
       "packageName": "@lucide/angular",
-      "outFileName": "_lucide_angular.flK9V1Jqhl.js",
+      "outFileName": "_lucide_angular.pX6wHmMClh.js",
       "requiredVersion": "^1.14.0",
       "singleton": true,
       "strictVersion": true,
@@ -131,7 +131,7 @@
     },
     {
       "packageName": "@ngrx/signals",
-      "outFileName": "_ngrx_signals.A9EuAjZ2BH.js",
+      "outFileName": "_ngrx_signals.QpYU4sKMha.js",
       "requiredVersion": "^21.1.1",
       "singleton": true,
       "strictVersion": true,
@@ -139,7 +139,7 @@
     },
     {
       "packageName": "@ngrx/signals/rxjs-interop",
-      "outFileName": "_ngrx_signals_rxjs_interop.xbKH55Z3HA.js",
+      "outFileName": "_ngrx_signals_rxjs_interop.oQ81pBdka-.js",
       "requiredVersion": "^21.1.1",
       "singleton": true,
       "strictVersion": true,
@@ -147,7 +147,7 @@
     },
     {
       "packageName": "ionicons/components/ion-icon.js",
-      "outFileName": "ionicons_components_ion_icon_js.qZrTfU-k2E.js",
+      "outFileName": "ionicons_components_ion_icon_js.mPXCGblXar.js",
       "requiredVersion": "^8.0.13",
       "singleton": true,
       "strictVersion": true,
@@ -155,7 +155,7 @@
     },
     {
       "packageName": "rxjs",
-      "outFileName": "rxjs.6ok7nCVkGv.js",
+      "outFileName": "rxjs.i5p9NoRmKE.js",
       "requiredVersion": "~7.8.0",
       "singleton": true,
       "strictVersion": true,
@@ -163,7 +163,7 @@
     },
     {
       "packageName": "rxjs/operators",
-      "outFileName": "rxjs_operators.r_Q156v-m0.js",
+      "outFileName": "rxjs_operators.qI8wnKPxpz.js",
       "requiredVersion": "~7.8.0",
       "singleton": true,
       "strictVersion": true,
@@ -171,7 +171,7 @@
     },
     {
       "packageName": "tslib",
-      "outFileName": "tslib.R-OZsgU0vZ.js",
+      "outFileName": "tslib.MKdywbOrQh.js",
       "requiredVersion": "^2.3.0",
       "singleton": true,
       "strictVersion": true,
