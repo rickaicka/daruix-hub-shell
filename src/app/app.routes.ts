@@ -3,6 +3,23 @@ import { loadRemoteModule } from '@angular-architects/native-federation';
 import { hubAuthGuard } from '@daruix/hub-auth';
 
 export const routes: Routes = [
+// Portal externo do fornecedor: mesma URL já enviada nos convites pelo BFF.
+// Esta rota deve vir ANTES de `hub`, para não montar o layout interno
+// (sidebar, header, breadcrumbs) e não exigir sessão de colaborador.
+{
+  path: 'hub/obras/leilao-reverso',
+  loadChildren: () =>
+    loadRemoteModule('obras', './Routes').then((m) => {
+      // Reutiliza a tela do MFE, sem expor as demais rotas do módulo.
+      const tenderRoute = (m.OBRAS_ROUTES as Routes).find(
+        (route) => route.path === 'leilao-reverso',
+      );
+      if (!tenderRoute?.loadComponent) {
+        throw new Error('Rota leilao-reverso não encontrada no MFE Obras.');
+      }
+      return [{ path: '', loadComponent: tenderRoute.loadComponent }];
+    }),
+},
   {
     path: 'login',
     loadComponent: () =>

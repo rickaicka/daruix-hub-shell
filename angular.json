@@ -130,7 +130,8 @@
               "buildTarget": "daruix-hub-shell:esbuild:production"
             },
             "development": {
-              "buildTarget": "daruix-hub-shell:esbuild:development"
+              "buildTarget": "daruix-hub-shell:esbuild:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
