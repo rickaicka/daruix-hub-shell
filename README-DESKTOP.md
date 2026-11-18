@@ -1,4 +1,4 @@
-# Daruix Hub — Electron
+# SGO Web — Electron
 
 O Electron fica no shell, em `desktop/`, com dependências e lockfile próprios. Obras e Cadastros são compilados como MFEs e copiados para o pacote. Angular continua sem SSR. Os arquivos da interface são locais; o Django/BFF e o banco continuam sendo serviços separados. A aplicação não fornece funcionamento offline dos dados, e as fontes Google existentes ainda dependem de internet.
 
@@ -73,7 +73,7 @@ Antes de distribuir, edite `shell/desktop/config.json`:
 
 `backendUrl` é a origem do Django, **sem `/api`**. Exemplo em produção: `https://hub.suaempresa.com`. O proxy mantém o caminho completo `/api/...`, query, verbo HTTP, corpo, token Bearer e respostas binárias de exportação.
 
-Na primeira execução, o aplicativo copia essa configuração para `desktop-config.json` na pasta de dados do usuário. No Windows, normalmente `%APPDATA%\Daruix Hub\desktop-config.json`. Edite esse arquivo e reinicie para mudar o BFF de uma instalação existente. Reinstalar não sobrescreve essa configuração.
+Na primeira execução, o aplicativo copia essa configuração para `desktop-config.json` na pasta de dados do usuário. No Windows, normalmente `%APPDATA%\SGO Web\desktop-config.json`. Edite esse arquivo e reinicie para mudar o BFF de uma instalação existente. Reinstalar não sobrescreve essa configuração.
 
 O front é servido apenas em `127.0.0.1:47831`, com fallback de rotas Angular. A porta fixa preserva a origem do armazenamento local entre execuções. Se ocupada, o app exibe um erro; configure outra porta (a mudança cria outra origem e exige novo login). O proxy usa o Host do BFF; ele precisa estar permitido no `ALLOWED_HOSTS` do Django. Não é necessário abrir CORS para o app empacotado, pois o renderer acessa `/api` na mesma origem.
 

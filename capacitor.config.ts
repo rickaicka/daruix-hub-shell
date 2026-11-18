@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'br.com.daruix.hub',
-  appName: 'Daruix Hub',
+  appName: 'SGO Web',
   webDir: 'www',
   android: {
     allowMixedContent: true,

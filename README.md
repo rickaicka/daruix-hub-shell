@@ -1,7 +1,7 @@
-Daruix Hub Shell
-Shell principal do Daruix Hub. Este projeto centraliza login, sessão, layout principal, menu de módulos e carregamento de micro front-ends via Native Federation.
+SGO Web
+Shell principal do SGO Web. Este projeto centraliza login, sessão, layout principal, menu de módulos e carregamento de micro front-ends via Native Federation.
 Visão geral
-O Daruix Hub é a base web/mobile para unificar os sistemas internos da Daruix, incluindo módulos modernos em Angular/Ionic e integrações com sistemas legados durante a transição.
+O SGO Web é a base web/mobile para unificar os sistemas internos da Daruix, incluindo módulos modernos em Angular/Ionic e integrações com sistemas legados durante a transição.
 O Shell é responsável por:
 autenticar usuários;
 manter sessão local;

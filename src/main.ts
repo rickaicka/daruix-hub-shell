@@ -15,5 +15,5 @@ const federationSource = environment.production
 initFederation(federationSource)
   .then(() => import('./bootstrap'))
   .catch((err) => {
-    console.error('Falha ao inicializar o Daruix Hub:', err);
+    console.error('Falha ao inicializar o SGO Web:', err);
   });

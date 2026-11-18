@@ -1,7 +1,7 @@
 {
   "name": "daruix-hub-desktop",
   "version": "1.0.0",
-  "description": "Daruix Hub Desktop",
+  "description": "SGO Web Desktop",
   "author": "Daruix",
   "private": true,
   "main": "main.cjs",
@@ -22,7 +22,7 @@
   },
   "build": {
     "appId": "br.com.daruix.hub",
-    "productName": "Daruix Hub",
+    "productName": "SGO Web",
     "asar": true,
     "directories": {
       "output": "release"

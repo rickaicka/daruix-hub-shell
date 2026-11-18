@@ -3,7 +3,7 @@ const { app, BrowserWindow, dialog, shell, session, Menu } = require('electron')
 const fs = require('node:fs');
 const path = require('node:path');
 const { createServer, validateConfig } = require('./server.cjs');
-app.setName('Daruix Hub');
+app.setName('SGO Web');
 const dev = !app.isPackaged && process.argv.includes('--dev');
 let server;
 let appOrigin;
@@ -17,7 +17,7 @@ function openExternal(url) {
 function createWindow(url = appOrigin) {
   const win = new BrowserWindow({
     width: 1440, height: 900, minWidth: 1024, minHeight: 700, show: false,
-    title: 'Daruix Hub', autoHideMenuBar: true,
+    title: 'SGO Web', autoHideMenuBar: true,
     webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true },
   });
   windows.add(win);
@@ -34,7 +34,7 @@ function createWindow(url = appOrigin) {
     return { action: 'deny' };
   });
   win.webContents.on('will-attach-webview', (event) => event.preventDefault());
-  win.loadURL(url).catch((error) => dialog.showErrorBox('Daruix Hub', `Não foi possível abrir o front.\n${error.message}`));
+  win.loadURL(url).catch((error) => dialog.showErrorBox('SGO Web', `Não foi possível abrir o front.\n${error.message}`));
   if (dev) win.webContents.openDevTools({ mode: 'detach' });
   return win;
 }
@@ -70,7 +70,7 @@ else {
     }
     createWindow();
     app.on('activate', () => { if (!windows.size) createWindow(); });
-  }).catch((error) => { dialog.showErrorBox('Daruix Hub — inicialização', `${error.message}\n\nVerifique desktop-config.json na pasta de dados do aplicativo. Se a porta estiver ocupada, altere port.`); app.quit(); });
+  }).catch((error) => { dialog.showErrorBox('SGO Web — inicialização', `${error.message}\n\nVerifique desktop-config.json na pasta de dados do aplicativo. Se a porta estiver ocupada, altere port.`); app.quit(); });
   app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
   app.on('before-quit', () => server?.close());
 }
